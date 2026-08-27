@@ -1,0 +1,2440 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#0f172a"/><text x="100" y="112" font-size="64" text-anchor="middle" fill="#F5C344" font-family="sans-serif">IX</text></svg></template>
+<helmet>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#ffffff;font-family:Inter,system-ui,sans-serif;color:#0f172a;-webkit-font-smoothing:antialiased}
+  a{color:#B567C2;text-decoration:none}
+  a:hover{color:#8f4a9e}
+  @keyframes idxUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @keyframes idxIn{from{opacity:0}to{opacity:1}}
+  @keyframes idxShimmer{0%{background-position:-320px 0}100%{background-position:320px 0}}
+  @keyframes idxPulse{0%,100%{opacity:.35;transform:scaleY(.4)}50%{opacity:1;transform:scaleY(1)}}
+  @keyframes idxSpin{to{transform:rotate(360deg)}}
+  textarea{font-family:Inter,system-ui,sans-serif}
+</style>
+</helmet>
+<div style="display:grid;grid-template-columns:236px 1fr;min-height:100vh;background:#ffffff;position:relative">
+
+  <aside style="border-right:1px solid #eef2f5;padding:26px 20px;display:flex;flex-direction:column;gap:28px;background:#ffffff">
+    <div style="display:flex;flex-direction:column;gap:3px">
+      <div style="font-size:.95rem;font-weight:600;letter-spacing:.14em;color:#0f172a">INDEX</div>
+      <div style="font-size:.95rem;font-weight:600;letter-spacing:.14em;background:linear-gradient(90deg,#F5C344,#F28482,#B567C2);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">AVATAR</div>
+    </div>
+
+    <button onClick="{{ newVideo }}" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px 14px;border:1px solid #0f172a;border-radius:22px;background:#0f172a;color:#ffffff;font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer;box-shadow:0 6px 18px -6px rgba(15,23,42,.5);transition:transform .15s ease" style-hover="transform:translateY(-1px)">New video</button>
+
+    <nav style="display:flex;flex-direction:column;gap:2px">
+      <sc-for list="{{ nav }}" as="item" hint-placeholder-count="4">
+        <button onClick="{{ item.go }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;border:0;border-radius:10px;background:{{ item.bg }};color:{{ item.color }};font-family:inherit;font-size:.85rem;font-weight:{{ item.weight }};text-align:left;cursor:pointer;transition:background .15s ease" style-hover="background:#F4F8F9">
+          <span>{{ item.label }}</span>
+          <span style="font-size:.72rem;font-weight:500;color:#94a3b8">{{ item.badge }}</span>
+        </button>
+      </sc-for>
+    </nav>
+
+    <div style="margin-top:auto;border:1px solid #eef2f5;border-radius:14px;padding:14px;background:#F4F8F9">
+      <div style="font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:7px">HeyGen balance</div>
+      <div style="font-size:1.35rem;font-weight:500;letter-spacing:-.02em;color:#0f172a;margin-bottom:9px">{{ minutesLeft }}</div>
+      <div style="height:4px;border-radius:3px;background:#e2e8f0;overflow:hidden">
+        <div style="height:100%;width:{{ minutesPct }}%;border-radius:3px;background:linear-gradient(90deg,#F5C344,#F28482,#B567C2)"></div>
+      </div>
+    </div>
+  </aside>
+
+  <main style="padding:0;overflow:hidden">
+
+    <sc-if value="{{ showStepper }}">
+      <div style="display:flex;align-items:center;gap:0;padding:22px 46px;border-bottom:1px solid #eef2f5;background:#ffffff">
+        <sc-for list="{{ steps }}" as="s" hint-placeholder-count="6">
+          <button onClick="{{ s.go }}" style="display:flex;align-items:center;gap:9px;padding:0 18px 0 0;border:0;background:transparent;font-family:inherit;cursor:pointer">
+            <span style="display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:{{ s.dotBg }};color:{{ s.dotColor }};border:1px solid {{ s.dotBorder }};font-size:.68rem;font-weight:600;flex:none;transition:all .2s ease">{{ s.num }}</span>
+            <span style="font-size:.8rem;font-weight:{{ s.weight }};color:{{ s.labelColor }};white-space:nowrap">{{ s.label }}</span>
+          </button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:52px 46px;animation:idxUp .3s ease both">
+        <div style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;background:linear-gradient(90deg,#F5C344,#F28482,#B567C2);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px">Welcome back</div>
+        <h1 style="font-size:2.4rem;font-weight:500;letter-spacing:-.025em;color:#0f172a;margin-bottom:10px">Make your next video</h1>
+        <p style="font-size:1.05rem;color:#64748b;line-height:1.5;margin-bottom:38px;max-width:30em">Pick a saved avatar to jump straight to the script, or start from a new face.</p>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <h2 style="font-size:.95rem;font-weight:600;color:#1e293b">Your avatars</h2>
+          <button onClick="{{ goLibrary }}" style="border:0;background:transparent;font-family:inherit;font-size:.8rem;font-weight:500;color:#64748b;cursor:pointer" style-hover="color:#0f172a">Manage</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:46px">
+          <sc-if value="{{ hasSaved }}" hint-placeholder-val="{{ true }}">
+          <sc-for list="{{ saved }}" as="a" hint-placeholder-count="2">
+            <button onClick="{{ a.use }}" style="position:relative;height:210px;border:0;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;text-align:left;background:{{ a.bg }};box-shadow:0 10px 30px -10px rgba(0,0,0,.1);transition:transform .18s ease,box-shadow .18s ease" style-hover="transform:translateY(-3px);box-shadow:0 18px 38px -12px rgba(0,0,0,.16)">
+              <span style="position:absolute;left:0;right:0;bottom:0;padding:16px 18px;background:linear-gradient(to top,rgba(255,255,255,.96),rgba(255,255,255,0));display:flex;flex-direction:column;gap:2px">
+                <span style="font-size:.9rem;font-weight:600;color:#1e293b">{{ a.name }}</span>
+                <span style="font-size:.74rem;font-weight:500;color:#64748b">{{ a.voice }}</span>
+              </span>
+            </button>
+          </sc-for>
+          </sc-if>
+          <button onClick="{{ goFace }}" style="height:210px;border:1px dashed #cbd5e1;border-radius:20px;background:#ffffff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-family:inherit;transition:border-color .18s ease,background .18s ease" style-hover="border-color:#B567C2;background:#F4F8F9">
+            <span style="font-size:1.4rem;color:#a855f7;line-height:1">✦</span>
+            <span style="font-size:.85rem;font-weight:600;color:#1e293b">New avatar</span>
+            <span style="font-size:.74rem;color:#94a3b8">Photo + voice</span>
+          </button>
+        </div>
+
+        <sc-if value="{{ hasProjects }}">
+        <h2 style="font-size:.95rem;font-weight:600;color:#1e293b;margin-bottom:16px">Recent projects</h2>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px">
+          <sc-for list="{{ projects }}" as="p" hint-placeholder-count="3">
+            <button onClick="{{ p.open }}" style="border:1px solid #eef2f5;border-radius:18px;overflow:hidden;background:#ffffff;box-shadow:0 10px 30px -10px rgba(0,0,0,.06);padding:0;text-align:left;font-family:inherit;cursor:pointer;transition:transform .18s ease" style-hover="transform:translateY(-3px)">
+              <span style="display:flex;align-items:center;justify-content:center;height:132px;background:{{ p.bg }}">
+                <sc-if value="{{ p.isRendering }}" hint-placeholder-val="{{ false }}">
+                  <span style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.92);box-shadow:0 4px 14px rgba(0,0,0,.12)">
+                    <span style="width:18px;height:18px;border-radius:50%;border:2px solid #e2e8f0;border-top-color:#B567C2;animation:idxSpin .7s linear infinite;display:block"></span>
+                  </span>
+                </sc-if>
+                <sc-if value="{{ p.isDone }}" hint-placeholder-val="{{ true }}">
+                  <span style="display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.9);font-size:.7rem;color:#0f172a;box-shadow:0 4px 14px rgba(0,0,0,.12)">▶</span>
+                </sc-if>
+                <sc-if value="{{ p.isFailed }}">
+                  <span style="padding:5px 12px;border-radius:20px;background:rgba(255,255,255,.94);font-size:.7rem;font-weight:600;color:#b3403e">Failed</span>
+                </sc-if>
+              </span>
+              <span style="display:flex;flex-direction:column;gap:4px;padding:14px 16px">
+                <span style="font-size:.85rem;font-weight:600;color:#1e293b">{{ p.title }}</span>
+                <span style="font-size:.74rem;color:#94a3b8">{{ p.meta }}</span>
+              </span>
+            </button>
+          </sc-for>
+        </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isFace }}">
+      <div style="padding:44px 46px;animation:idxUp .3s ease both">
+        <h1 style="font-size:1.8rem;font-weight:500;letter-spacing:-.025em;color:#0f172a;margin-bottom:8px">Avatar</h1>
+
+
+        <sc-if value="{{ onSelectPage }}" hint-placeholder-val="{{ true }}">
+          <p style="font-size:.98rem;color:#64748b;line-height:1.5;margin-bottom:24px">Upload a photo to create your avatar.</p>
+          <div style="display:grid;grid-template-columns:240px;gap:20px">
+            <button onClick="{{ uploadFace }}" style="position:relative;aspect-ratio:3/4;border:1px dashed #cbd5e1;border-radius:20px;background:#ffffff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-family:inherit;overflow:hidden;transition:border-color .18s ease" style-hover="border-color:#B567C2">
+              <span style="font-size:1.3rem;color:#a855f7;line-height:1">↑</span>
+              <span style="font-size:.85rem;font-weight:600;color:#1e293b">New avatar</span>
+              <span style="font-size:.73rem;color:#94a3b8">Upload a photo</span>
+            </button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ onClothingPage }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ backToSelect }}" style="margin-bottom:20px;padding:8px 16px;border:1px solid #e2e8f0;border-radius:20px;background:#ffffff;font-family:inherit;font-size:.78rem;font-weight:600;color:#475569;cursor:pointer" style-hover="border-color:#B567C2;color:#B567C2">← Back</button>
+          <sc-if value="{{ isBeckyChoice }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:800px">
+            <sc-for list="{{ outfits }}" as="f" hint-placeholder-count="3">
+              <button onClick="{{ f.pick }}" onContextMenu="{{ f.menu }}" style="position:relative;aspect-ratio:2/3;border:0;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;background:#f4f4f4 url("{{ f.thumb }}") center/cover;box-shadow:0 10px 30px -10px rgba(0,0,0,0.1);outline:{{ f.ring }};outline-offset:2px;transition:transform .18s ease,box-shadow .18s ease" style-hover="transform:translateY(-3px)">
+                <span style="position:absolute;left:0;right:0;bottom:0;padding:26px 16px 14px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.55));font-size:.82rem;font-weight:600;color:#ffffff">{{ f.name }}</span>
+              </button>
+            </sc-for>
+            <button onClick="{{ addBeckyLook }}" style="aspect-ratio:2/3;border:1px dashed #cbd5e1;border-radius:20px;background:#ffffff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-family:inherit;transition:border-color .18s ease" style-hover="border-color:#B567C2">
+              <sc-if value="{{ addingBuiltinLook }}" hint-placeholder-val="{{ false }}"><span style="width:18px;height:18px;border-radius:50%;border:2px solid #e2e8f0;border-top-color:#B567C2;animation:idxSpin .7s linear infinite;display:block"></span></sc-if>
+              <sc-if value="{{ notAddingBuiltinLook }}" hint-placeholder-val="{{ true }}">
+                <span style="font-size:1.3rem;color:#a855f7;line-height:1">↑</span>
+                <span style="font-size:.85rem;font-weight:600;color:#1e293b">Upload an outfit</span>
+                <span style="font-size:.73rem;color:#94a3b8">Add your own photo</span>
+              </sc-if>
+            </button>
+          </div>
+          </sc-if>
+
+          <sc-if value="{{ isAveryChoice }}">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:800px">
+            <sc-for list="{{ averyLooks }}" as="al" hint-placeholder-count="2">
+              <button onClick="{{ al.pick }}" onContextMenu="{{ al.menu }}" style="position:relative;aspect-ratio:2/3;border:0;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;background:#f4f4f4 url("{{ al.thumb }}") center/cover;box-shadow:0 10px 30px -10px rgba(0,0,0,0.1);outline:{{ al.ring }};outline-offset:2px;transition:transform .18s ease" style-hover="transform:translateY(-3px)">
+                <span style="position:absolute;left:0;right:0;bottom:0;padding:26px 16px 14px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.55));font-size:.82rem;font-weight:600;color:#ffffff">{{ al.name }}</span>
+              </button>
+            </sc-for>
+            <button onClick="{{ addAveryLook }}" style="aspect-ratio:2/3;border:1px dashed #cbd5e1;border-radius:20px;background:#ffffff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-family:inherit;transition:border-color .18s ease" style-hover="border-color:#B567C2">
+              <sc-if value="{{ addingBuiltinLook }}" hint-placeholder-val="{{ false }}"><span style="width:18px;height:18px;border-radius:50%;border:2px solid #e2e8f0;border-top-color:#B567C2;animation:idxSpin .7s linear infinite;display:block"></span></sc-if>
+              <sc-if value="{{ notAddingBuiltinLook }}" hint-placeholder-val="{{ true }}">
+                <span style="font-size:1.3rem;color:#a855f7;line-height:1">↑</span>
+                <span style="font-size:.85rem;font-weight:600;color:#1e293b">Upload a look</span>
+                <span style="font-size:.73rem;color:#94a3b8">Add your own photo</span>
+              </sc-if>
+            </button>
+          </div>
+          </sc-if>
+        </sc-if>
+        <sc-if value="{{ onBackgroundPage }}" hint-placeholder-val="{{ false }}">
+          <p style="font-size:.98rem;color:#64748b;line-height:1.5;margin-bottom:16px">Keep the original background, pick one from your library, or upload a new image. Anything but the original is composed with Nano Banana.</p>
+          <button onClick="{{ backToClothing }}" style="margin-bottom:20px;padding:8px 16px;border:1px solid #e2e8f0;border-radius:20px;background:#ffffff;font-family:inherit;font-size:.78rem;font-weight:600;color:#475569;cursor:pointer" style-hover="border-color:#B567C2;color:#B567C2">← Back to clothing</button>
+
+          <sc-if value="{{ mergeError }}" hint-placeholder-val="{{ false }}">
+            <div style="max-width:900px;padding:11px 15px;border:1px solid #F28482;border-radius:14px;background:#fff5f4;font-size:.8rem;line-height:1.5;color:#b3403e;margin-bottom:18px">{{ mergeError }}</div>
+          </sc-if>
+
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;max-width:960px">
+            <button onClick="{{ keepOriginalBg }}" style="position:relative;aspect-ratio:2/3;border:2px solid #0f172a;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;background:#f4f4f4 {{ keepOriginalThumb }};box-shadow:0 10px 30px -10px rgba(0,0,0,0.1);transition:transform .18s ease" style-hover="transform:translateY(-3px)">
+              <span style="position:absolute;left:0;right:0;bottom:0;padding:26px 14px 14px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.6));display:flex;flex-direction:column;gap:2px;text-align:left">
+                <span style="font-size:.82rem;font-weight:600;color:#ffffff">Keep original</span>
+                <span style="font-size:.7rem;font-weight:500;color:rgba(255,255,255,.8)">No compose</span>
+              </span>
+            </button>
+
+            <sc-for list="{{ wizardBgs }}" as="b" hint-placeholder-count="3">
+              <button onClick="{{ b.pick }}" style="position:relative;aspect-ratio:2/3;border:0;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;background:{{ b.bg }};box-shadow:0 10px 30px -10px rgba(0,0,0,0.1);outline:{{ b.ring }};outline-offset:2px;transition:transform .18s ease" style-hover="transform:translateY(-3px)">
+                <span style="position:absolute;left:0;right:0;bottom:0;padding:26px 14px 14px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.6));font-size:.82rem;font-weight:600;color:#ffffff;text-align:left">{{ b.name }}</span>
+              </button>
+            </sc-for>
+
+            <button onClick="{{ uploadWizardBg }}" style="aspect-ratio:2/3;border:1px dashed #cbd5e1;border-radius:20px;background:#ffffff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-family:inherit;transition:border-color .18s ease" style-hover="border-color:#B567C2">
+              <span style="font-size:1.2rem;color:#a855f7;line-height:1">↑</span>
+              <span style="font-size:.82rem;font-weight:600;color:#1e293b">Upload new image</span>
+              <span style="font-size:.72rem;color:#94a3b8">JPG or PNG</span>
+            </button>
+          </div>
+
+          <sc-if value="{{ merging }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:10px;margin-top:22px;font-size:.85rem;font-weight:500;color:#64748b">
+              <span style="width:16px;height:16px;border-radius:50%;border:2px solid #e2e8f0;border-top-color:#B567C2;animation:idxSpin .7s linear infinite;display:block"></span>
+              <span>Composing your avatar into the background…</span>
+            </div>
+          </sc-if>
+        </sc-if>
+
+        <sc-if value="{{ onPreviewPage }}" hint-placeholder-val="{{ false }}">
+          <p style="font-size:.98rem;color:#64748b;line-height:1.5;margin-bottom:16px">Here's the composed result.</p>
+          <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">
+            <span style="display:block;width:300px;aspect-ratio:2/3;border-radius:20px;overflow:hidden;background:#f4f4f4 url("{{ previewImg }}") center/cover;box-shadow:0 10px 30px -10px rgba(0,0,0,.14)"></span>
+            <div style="display:flex;flex-direction:column;gap:10px;padding-top:6px">
+              <button onClick="{{ confirmPreview }}" style="padding:11px 22px;border:1px solid #0f172a;border-radius:20px;background:#0f172a;color:#ffffff;font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer">Continue →</button>
+              <button onClick="{{ changeBackground }}" style="padding:11px 22px;border:1px solid #e2e8f0;border-radius:20px;background:#ffffff;font-family:inherit;font-size:.82rem;font-weight:600;color:#475569;cursor:pointer" style-hover="border-color:#B567C2;color:#B567C2">Choose a different background</button>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isBg }}">
+      <div style="padding:44px 46px;animation:idxUp .3s ease both">
+        <h1 style="font-size:1.8rem;font-weight:500;letter-spacing:-.025em;color:#0f172a;margin-bottom:8px">Background library</h1>
+        <p style="font-size:.98rem;color:#64748b;line-height:1.5;margin-bottom:24px">Manage the scenes used when composing your avatar into a background. Click a tile to rename it.</p>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;max-width:1060px">
+          <sc-for list="{{ backgrounds }}" as="b" hint-placeholder-count="6">
+            <div style="position:relative">
+              <button onClick="{{ b.rename }}" onContextMenu="{{ b.renameCtx }}" style="position:relative;height:180px;width:100%;border:0;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;background:{{ b.bg }};box-shadow:0 10px 30px -10px rgba(0,0,0,0.1);transition:transform .18s ease" style-hover="transform:translateY(-3px)">
+                <span style="position:absolute;left:16px;bottom:14px;font-size:.82rem;font-weight:600;color:#1e293b">{{ b.name }}</span>
+              </button>
+              <button onClick="{{ b.remove }}" style="position:absolute;top:8px;right:8px;width:26px;height:26px;border:0;border-radius:50%;background:rgba(255,255,255,.92);color:#b3403e;font-family:inherit;font-size:.85rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(0,0,0,.12)">×</button>
+            </div>
+          </sc-for>
+          <button onClick="{{ addBg }}" style="height:180px;border:1px dashed #cbd5e1;border-radius:20px;background:#ffffff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-family:inherit;transition:border-color .18s ease" style-hover="border-color:#B567C2">
+            <sc-if value="{{ addingBg }}" hint-placeholder-val="{{ false }}"><span style="width:16px;height:16px;border-radius:50%;border:2px solid #e2e8f0;border-top-color:#B567C2;animation:idxSpin .7s linear infinite;display:block"></span></sc-if>
+            <sc-if value="{{ notAddingBg }}" hint-placeholder-val="{{ true }}">
+              <span style="font-size:1.1rem;color:#a855f7;line-height:1">✦</span>
+              <span style="font-size:.82rem;font-weight:600;color:#1e293b">Add to library</span>
+              <span style="font-size:.72rem;color:#94a3b8">JPG or PNG</span>
+            </sc-if>
+          </button>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isScript }}">
+      <div style="padding:44px 46px;animation:idxUp .3s ease both">
+        <h1 style="font-size:1.8rem;font-weight:500;letter-spacing:-.025em;color:#0f172a;margin-bottom:8px">Voice &amp; script</h1>
+        <p style="font-size:.98rem;color:#64748b;line-height:1.5;margin-bottom:16px">Pick or clone a voice, then type what your avatar should say. We'll estimate the length and cost as you go.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px">
+          <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid #eef2f5;border-radius:20px;background:#F4F8F9;font-size:.72rem;font-weight:600;color:#64748b"><span style="color:#B567C2">API</span><code style="font-family:ui-monospace,monospace;color:#1e293b">minimax /v1/t2a_v2</code></span>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 300px;gap:26px;max-width:1060px;align-items:start">
+          <div>
+            <div style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:12px">Voice — {{ voiceSummary }}</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
+              <button onClick="{{ startRecord }}" style="border:1px solid {{ cloneBorder }};border-radius:16px;background:#ffffff;padding:14px 16px;text-align:left;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;gap:4px;box-shadow:0 6px 16px rgba(0,0,0,.04);transition:transform .16s ease" style-hover="transform:translateY(-2px)">
+                <span style="display:flex;align-items:center;gap:7px;font-size:.85rem;font-weight:600;color:#1e293b"><span style="color:#a855f7;font-size:.95rem">✦</span>Clone my voice</span>
+                <span style="font-size:.74rem;color:#64748b;line-height:1.4">Record 30 seconds in the browser</span>
+              </button>
+              <button onClick="{{ uploadVoice }}" style="border:1px solid #e2e8f0;border-radius:16px;background:#ffffff;padding:14px 16px;text-align:left;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;gap:4px;transition:border-color .16s ease,transform .16s ease" style-hover="border-color:#0f172a;transform:translateY(-2px)">
+                <span style="font-size:.85rem;font-weight:600;color:#1e293b">Upload a sample</span>
+                <span style="font-size:.74rem;color:#64748b;line-height:1.4">MP3 or WAV, 30s or more</span>
+              </button>
+              <button onClick="{{ uploadLipsync }}" style="border:1px solid {{ lipsyncBorder }};border-radius:16px;background:#ffffff;padding:14px 16px;text-align:left;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;gap:4px;transition:border-color .16s ease,transform .16s ease" style-hover="border-color:#0f172a;transform:translateY(-2px)">
+                <span style="font-size:.85rem;font-weight:600;color:#1e293b">Upload lipsync audio</span>
+                <span style="font-size:.74rem;color:#64748b;line-height:1.4">Skips voice generation — drives the mouth directly</span>
+              </button>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:26px">
+              <span style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#94a3b8">Model</span>
+              <sc-for list="{{ models }}" as="m" hint-placeholder-count="6">
+                <button onClick="{{ m.pick }}" style="padding:6px 13px;border:1px solid {{ m.border }};border-radius:16px;background:{{ m.bg }};color:{{ m.color }};font-family:inherit;font-size:.74rem;font-weight:600;cursor:pointer;transition:all .16s ease">{{ m.label }}</button>
+              </sc-for>
+            </div>
+
+            <sc-if value="{{ recording }}">
+              <div style="border:1px solid #0f172a;border-radius:18px;padding:20px 22px;margin-bottom:18px;background:#F4F8F9;animation:idxIn .2s ease both">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <span style="width:9px;height:9px;border-radius:50%;background:#F28482;display:block;animation:idxIn .6s ease-in-out infinite alternate"></span>
+                    <span style="font-size:.86rem;font-weight:600;color:#1e293b">Recording</span>
+                  </div>
+                  <span style="font-size:.86rem;font-weight:500;color:#64748b">{{ recSec }} / 30s</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:4px;height:36px;margin-bottom:14px">
+                  <sc-for list="{{ bars }}" as="b" hint-placeholder-count="40">
+                    <span style="flex:1;height:{{ b.h }}%;border-radius:2px;background:linear-gradient(180deg,#F5C344,#B567C2);animation:idxPulse {{ b.dur }}s ease-in-out infinite;display:block"></span>
+                  </sc-for>
+                </div>
+                <div style="height:4px;border-radius:3px;background:#e2e8f0;overflow:hidden;margin-bottom:14px">
+                  <div style="height:100%;width:{{ recPct }}%;border-radius:3px;background:linear-gradient(90deg,#F5C344,#F28482,#B567C2);transition:width .3s linear"></div>
+                </div>
+                <button onClick="{{ stopRecord }}" style="border:none;border-radius:20px;background:#0f172a;color:#fff;padding:9px 16px;font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer">Stop &amp; clone now</button>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ cloneError }}">
+              <div style="padding:12px 16px;border:1px solid #F28482;border-radius:14px;background:#fff5f5;margin-bottom:18px;font-size:.78rem;line-height:1.5;color:#b3413f">{{ cloneError }}</div>
+            </sc-if>
+
+            <sc-if value="{{ training }}">
+              <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid #eef2f5;border-radius:16px;background:#F4F8F9;margin-bottom:18px;animation:idxIn .2s ease both">
+                <span style="width:15px;height:15px;border-radius:50%;border:2px solid #e2e8f0;border-top-color:#B567C2;animation:idxSpin .7s linear infinite;display:block"></span>
+                <span style="font-size:.84rem;font-weight:500;color:#475569">Training your voice — we'll use it when it's ready.</span>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ hasClonedVoice }}">
+              <div style="border:1px solid #0f172a;border-radius:16px;background:#ffffff;margin-bottom:18px;overflow:hidden">
+                <div style="padding:9px 14px;border-bottom:1px solid #eef2f5;background:#F4F8F9;font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#94a3b8">Cloned voices · saved to MiniMax, shared with everyone using this app</div>
+                <sc-for list="{{ clonedVoiceRows }}" as="cv" hint-placeholder-count="1">
+                  <div style="display:flex;align-items:center;gap:9px;border-bottom:1px solid #f4f8f9;background:{{ cv.rowBg }};padding:9px 14px">
+                    <button onClick="{{ cv.play }}" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;border:0;background:#a855f7;font-size:.6rem;color:#fff;flex:none;cursor:pointer;font-family:inherit">▶</button>
+                    <sc-if value="{{ cv.editing }}" hint-placeholder-val="{{ false }}">
+                      <input onChange="{{ onVoiceDraft }}" onBlur="{{ commitVoiceName }}" value="{{ voiceDraft }}" style="flex:1;padding:6px 10px;border:1px solid #B567C2;border-radius:10px;font-family:inherit;font-size:.82rem;color:#334155;outline:none" />
+                    </sc-if>
+                    <sc-if value="{{ cv.notEditing }}" hint-placeholder-val="{{ true }}">
+                      <button onClick="{{ cv.pick }}" style="flex:1;font-size:.84rem;font-weight:600;color:#1e293b;border:none;background:transparent;text-align:left;cursor:pointer;font-family:inherit">{{ cv.name }}</button>
+                      <span style="font-size:.7rem;color:{{ cv.checkColor }}">{{ cv.checkLabel }}</span>
+                      <button onClick="{{ cv.startRename }}" style="padding:4px 10px;border:1px solid #e2e8f0;border-radius:14px;background:#ffffff;font-family:inherit;font-size:.68rem;font-weight:600;color:#475569;cursor:pointer" style-hover="border-color:#B567C2;color:#B567C2">Rename</button>
+                      <button onClick="{{ cv.remove }}" style="padding:4px 10px;border:1px solid #e2e8f0;border-radius:14px;background:#ffffff;font-family:inherit;font-size:.68rem;font-weight:600;color:#475569;cursor:pointer" style-hover="border-color:#F28482;color:#F28482">Delete</button>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <div style="border:1px solid #eef2f5;border-radius:16px;background:#ffffff;margin-bottom:26px;overflow:hidden">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid #eef2f5;background:#F4F8F9">
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <sc-for list="{{ voiceFilters }}" as="f" hint-placeholder-count="4">
+                    <button onClick="{{ f.pick }}" style="padding:5px 12px;border:1px solid {{ f.border }};border-radius:16px;background:{{ f.bg }};color:{{ f.color }};font-family:inherit;font-size:.7rem;font-weight:600;cursor:pointer">{{ f.label }}</button>
+                  </sc-for>
+                </div>
+                <span style="font-size:.68rem;color:#94a3b8;flex:none">{{ voiceCount }} voices</span>
+              </div>
+              <div style="max-height:300px;overflow-y:auto;display:flex;flex-direction:column">
+                <sc-for list="{{ voices }}" as="v" hint-placeholder-count="8">
+                  <div style="display:flex;align-items:center;gap:9px;border-bottom:1px solid #f4f8f9;border-left:3px solid {{ v.border }};background:{{ v.rowBg }};padding:9px 14px">
+                    <button onClick="{{ v.play }}" style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;border:1px solid #e2e8f0;background:#ffffff;font-size:.6rem;color:#0f172a;flex:none;cursor:pointer;font-family:inherit" style-hover="border-color:#B567C2;color:#B567C2">▶</button>
+                    <button onClick="{{ v.stop }}" style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;border:1px solid #e2e8f0;background:#ffffff;font-size:.6rem;color:#64748b;flex:none;cursor:pointer;font-family:inherit" style-hover="border-color:#F28482;color:#F28482">■</button>
+                    <button onClick="{{ v.pick }}" style="flex:1;display:flex;flex-direction:column;gap:1px;min-width:0;border:none;background:transparent;padding:2px 0;text-align:left;cursor:pointer;font-family:inherit">
+                      <span style="font-size:.8rem;font-weight:600;color:#1e293b">{{ v.name }}</span>
+                      <span style="font-size:.7rem;color:#64748b">{{ v.desc }}</span>
+                    </button>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="height:1px;background:#eef2f5;margin-bottom:26px"></div>
+
+            <div style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:12px">Script</div>
+            <div style="display:flex;gap:8px;margin-bottom:14px">
+              <sc-for list="{{ langs }}" as="l" hint-placeholder-count="3">
+                <button onClick="{{ l.pick }}" style="padding:7px 16px;border:1px solid {{ l.border }};border-radius:20px;background:{{ l.bg }};color:{{ l.color }};font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .16s ease">{{ l.label }}</button>
+              </sc-for>
+            </div>
+            <textarea onChange="{{ onScript }}" value="{{ script }}" placeholder="Good morning everyone…" style="width:100%;height:220px;border:1px solid #e2e8f0;border-radius:18px;padding:22px 24px;font-size:1rem;line-height:1.65;color:#334155;resize:none;outline:none;background:#ffffff;box-shadow:0 8px 20px rgba(0,0,0,.03);transition:border-color .16s ease" style-focus="border-color:#B567C2"></textarea>
+            <div style="display:flex;gap:9px;margin-top:16px;flex-wrap:wrap">
+              <sc-for list="{{ rewrites }}" as="r" hint-placeholder-count="3">
+                <button onClick="{{ r.run }}" style="display:flex;align-items:center;gap:6px;padding:6px 15px;border:1px solid #0f172a;border-radius:20px;background:#ffffff;font-family:inherit;font-size:.76rem;font-weight:600;color:#1e293b;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,.08);transition:transform .14s ease" style-hover="transform:translateY(-1px)"><span style="color:#a855f7;font-size:.95rem">✦</span>{{ r.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:18px">
+          <sc-if value="{{ hasComposed }}" hint-placeholder-val="{{ false }}">
+            <div style="border:1px solid #eef2f5;border-radius:20px;background:#ffffff;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 30px -14px rgba(0,0,0,.08)">
+              <span style="font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#94a3b8">Your avatar</span>
+              <span style="display:block;width:100%;aspect-ratio:2/3;border-radius:14px;overflow:hidden;background:#f4f4f4 {{ composedThumb }}"></span>
+              <button onClick="{{ changeBackground }}" style="padding:9px 14px;border:1px solid #e2e8f0;border-radius:18px;background:#ffffff;font-family:inherit;font-size:.78rem;font-weight:600;color:#475569;cursor:pointer" style-hover="border-color:#B567C2;color:#B567C2">Change background</button>
+            </div>
+          </sc-if>
+          <div style="border:1px solid #eef2f5;border-radius:20px;background:#F4F8F9;padding:24px;display:flex;flex-direction:column;gap:18px">
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <span style="font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#94a3b8">Estimated length</span>
+              <span style="font-size:1.6rem;font-weight:500;letter-spacing:-.02em;color:#0f172a">{{ durText }}</span>
+            </div>
+            <div style="height:1px;background:#e2e8f0"></div>
+            <div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:#64748b">Words</span><span style="font-weight:600;color:#1e293b">{{ words }}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:#64748b">Engine</span><span style="font-weight:600;color:#1e293b">{{ engine }}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:#64748b">Cost</span><span style="font-weight:600;color:#1e293b">{{ costText }}</span></div>
+            <div style="display:flex;gap:8px">
+              <button onClick="{{ previewVoice }}" style="flex:1;padding:9px 14px;border:1px solid #e2e8f0;border-radius:20px;background:#ffffff;font-family:inherit;font-size:.78rem;font-weight:600;color:#1e293b;cursor:pointer;transition:border-color .16s ease" style-hover="border-color:#0f172a">{{ previewLabel }}</button>
+              <button onClick="{{ stopVoice }}" style="padding:9px 14px;border:1px solid #e2e8f0;border-radius:20px;background:#ffffff;font-family:inherit;font-size:.78rem;font-weight:600;color:#64748b;cursor:pointer;transition:border-color .16s ease" style-hover="border-color:#F28482;color:#F28482">Stop</button>
+            </div>
+            <sc-if value="{{ ttsError }}">
+              <span style="font-size:.72rem;color:#F28482;line-height:1.4">{{ ttsError }}</span>
+            </sc-if>
+            <button onClick="{{ goFormat }}" style="padding:11px 14px;border:1px solid #0f172a;border-radius:22px;background:#0f172a;color:#ffffff;font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer;box-shadow:0 6px 18px -6px rgba(15,23,42,.5);transition:transform .15s ease" style-hover="transform:translateY(-1px)">Choose format</button>
+          </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isFormat }}">
+      <div style="padding:44px 46px;animation:idxUp .3s ease both">
+        <h1 style="font-size:1.8rem;font-weight:500;letter-spacing:-.025em;color:#0f172a;margin-bottom:8px">Choose the shape</h1>
+        <p style="font-size:.98rem;color:#64748b;line-height:1.5;margin-bottom:24px">Each frame shows your actual composed still, cropped the way it will be delivered.</p>
+        <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:30px">
+          <span style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#94a3b8">Resolution</span>
+          <sc-for list="{{ resolutions }}" as="rs" hint-placeholder-count="3">
+            <button onClick="{{ rs.pick }}" style="padding:7px 16px;border:1px solid {{ rs.border }};border-radius:20px;background:{{ rs.bg }};color:{{ rs.color }};font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .16s ease">{{ rs.label }}</button>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,max-content);gap:26px;align-items:end;justify-content:start">
+          <sc-for list="{{ ratios }}" as="r" hint-placeholder-count="4">
+            <button onClick="{{ r.pick }}" style="border:0;background:transparent;padding:0;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;gap:11px;align-items:center;transition:transform .18s ease" style-hover="transform:translateY(-3px)">
+              <span style="position:relative;display:block;width:{{ r.w }}px;height:{{ r.h }}px;border-radius:16px;overflow:hidden;background:{{ r.bg }};box-shadow:{{ r.shadow }};outline:{{ r.ring }};outline-offset:3px">
+                <span style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:2.2rem;font-weight:500;color:rgba(15,23,42,.24)">{{ r.mono }}</span>
+              </span>
+              <span style="display:flex;flex-direction:column;gap:2px;align-items:center">
+                <span style="font-size:.85rem;font-weight:600;color:#1e293b">{{ r.label }}</span>
+                <span style="font-size:.73rem;color:#94a3b8">{{ r.use }}</span>
+              </span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isConfirm }}">
+      <div style="padding:44px 46px;animation:idxUp .3s ease both">
+        <h1 style="font-size:1.8rem;font-weight:500;letter-spacing:-.025em;color:#0f172a;margin-bottom:8px">Ready to generate</h1>
+        <p style="font-size:.98rem;color:#64748b;line-height:1.5;margin-bottom:16px">One last look. Nothing is charged if the render fails.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">
+          <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid #eef2f5;border-radius:20px;background:#F4F8F9;font-size:.72rem;font-weight:600;color:#64748b"><span style="color:#B567C2">API</span><code style="font-family:ui-monospace,monospace;color:#1e293b">{{ genEndpoint }}</code></span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 320px;gap:26px;max-width:1000px;align-items:start">
+          <div style="border:1px solid #eef2f5;border-radius:20px;overflow:hidden;background:#ffffff;box-shadow:0 10px 30px -10px rgba(0,0,0,.1)">
+            <div style="display:flex;flex-direction:column">
+              <sc-for list="{{ summary }}" as="s" hint-placeholder-count="6">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 22px;border-bottom:1px solid #f4f8f9">
+                  <span style="font-size:.8rem;font-weight:500;color:#94a3b8">{{ s.k }}</span>
+                  <span style="font-size:.88rem;font-weight:600;color:#1e293b;text-align:right">{{ s.v }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="padding:20px 22px;background:#F4F8F9">
+              <div style="font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:8px">Script</div>
+              <p style="font-size:.88rem;line-height:1.65;color:#475569">{{ scriptPreview }}</p>
+            </div>
+          </div>
+          <div style="border:1px solid #0f172a;border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:16px;background:#ffffff;box-shadow:0 10px 30px -10px rgba(0,0,0,.12)">
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <span style="font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#94a3b8">You'll be charged</span>
+              <span style="font-size:1.8rem;font-weight:500;letter-spacing:-.02em;color:#0f172a">{{ costText }}</span>
+              <span style="font-size:.78rem;color:#64748b">{{ durText }} · {{ engine }}</span>
+            </div>
+            <p style="font-size:.79rem;line-height:1.6;color:#64748b">Renders take about four to six minutes. You can close this tab — we'll keep it in your projects.</p>
+            <sc-if value="{{ isKlingEngine }}" hint-placeholder-val="{{ true }}">
+              <span style="font-size:.7rem;line-height:1.5;color:#94a3b8">HeyGen Avatar V adds your photo as a new Look on the shared avatar, then animates it at 1080p and lip-syncs it to the generated voice.</span>
+            </sc-if>
+            <sc-if value="{{ genError }}">
+              <div style="padding:10px 14px;border:1px solid #F28482;border-radius:14px;background:#fff5f4;font-size:.78rem;line-height:1.5;color:#b3403e">{{ genError }}</div>
+            </sc-if>
+            <button onClick="{{ generate }}" style="padding:12px 14px;border:1px solid #0f172a;border-radius:22px;background:#0f172a;color:#ffffff;font-family:inherit;font-size:.85rem;font-weight:600;cursor:pointer;box-shadow:0 6px 18px -6px rgba(15,23,42,.5);transition:transform .15s ease" style-hover="transform:translateY(-1px)">Generate video</button>
+          </div>
+          <div style="border:1px solid #eef2f5;border-radius:20px;padding:20px 22px;background:#ffffff;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+              <span style="font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#94a3b8">API credit</span>
+              <button onClick="{{ checkCredits }}" style="padding:5px 12px;border:1px solid #e2e8f0;border-radius:16px;background:#F4F8F9;font-family:inherit;font-size:.7rem;font-weight:600;color:#475569;cursor:pointer" style-hover="border-color:#B567C2;color:#B567C2">{{ creditBtnLabel }}</button>
+            </div>
+            <sc-for list="{{ credits }}" as="c" hint-placeholder-count="3">
+              <div style="display:flex;flex-direction:column;gap:3px;padding-bottom:10px;border-bottom:1px solid #f4f8f9">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                  <span style="font-size:.8rem;font-weight:600;color:#1e293b">{{ c.name }}</span>
+                  <span style="font-size:.8rem;font-weight:600;color:{{ c.color }}">{{ c.value }}</span>
+                </div>
+                <span style="font-size:.68rem;line-height:1.5;color:#94a3b8">{{ c.note }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isRendering }}">
+      <div style="padding:80px 46px;display:flex;justify-content:center;animation:idxIn .3s ease both">
+        <div style="width:100%;max-width:560px;border-radius:24px;overflow:hidden;background:linear-gradient(90deg,#F4F8F9,#ffffff,#F4F8F9);background-size:320px 100%;animation:idxShimmer 2.4s linear infinite;border:1px solid #eef2f5;padding:38px 40px;box-shadow:0 10px 30px -10px rgba(0,0,0,.1)">
+          <div style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;background:linear-gradient(90deg,#F5C344,#F28482,#B567C2);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px">Generating</div>
+          <h2 style="font-size:1.5rem;font-weight:500;letter-spacing:-.02em;color:#0f172a;margin-bottom:28px">{{ stageLabel }}</h2>
+          <div style="height:5px;border-radius:3px;background:#e2e8f0;overflow:hidden;margin-bottom:28px">
+            <div style="height:100%;width:{{ progress }}%;border-radius:3px;background:linear-gradient(90deg,#F5C344,#F28482,#B567C2);transition:width .5s ease"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:26px">
+            <sc-for list="{{ stages }}" as="s" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:11px">
+                <span style="display:flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:{{ s.bg }};color:{{ s.fg }};font-size:.6rem;font-weight:600;flex:none">{{ s.icon }}</span>
+                <span style="font-size:.86rem;font-weight:{{ s.weight }};color:{{ s.color }}">{{ s.label }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding-top:20px;border-top:1px solid #eef2f5">
+            <span style="font-size:.78rem;line-height:1.5;color:#64748b">You can leave this page — it keeps rendering in Projects.</span>
+            <button onClick="{{ goDashboard }}" style="padding:9px 18px;border:1px solid #0f172a;border-radius:20px;background:#ffffff;font-family:inherit;font-size:.79rem;font-weight:600;color:#0f172a;cursor:pointer;flex:none;transition:transform .15s ease" style-hover="transform:translateY(-1px)">Back to home</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isResult }}">
+      <div style="padding:44px 46px;animation:idxUp .3s ease both">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px;gap:20px">
+          <div>
+            <div style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;background:linear-gradient(90deg,#F5C344,#F28482,#B567C2);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px">Done</div>
+            <h1 style="font-size:1.8rem;font-weight:500;letter-spacing:-.025em;color:#0f172a">{{ resultTitle }}</h1>
+          </div>
+          <div style="display:flex;gap:9px">
+            <button onClick="{{ goDashboard }}" style="padding:9px 18px;border:1px solid #e2e8f0;border-radius:20px;background:#ffffff;font-family:inherit;font-size:.8rem;font-weight:600;color:#1e293b;cursor:pointer;transition:border-color .16s ease" style-hover="border-color:#0f172a">Done</button>
+            <sc-if value="{{ resultVideoUrl }}" hint-placeholder-val="{{ false }}">
+              <a href="{{ resultVideoUrl }}" target="_blank" rel="noopener" style="padding:9px 18px;border:1px solid #e2e8f0;border-radius:20px;background:#ffffff;font-size:.8rem;font-weight:600;color:#1e293b;display:inline-flex;align-items:center" style-hover="border-color:#0f172a;color:#0f172a">Open in new tab</a>
+            </sc-if>
+            <button onClick="{{ downloadVideo }}" style="padding:9px 18px;border:1px solid #0f172a;border-radius:20px;background:#0f172a;color:#ffffff;font-family:inherit;font-size:.8rem;font-weight:600;cursor:pointer;box-shadow:0 6px 18px -6px rgba(15,23,42,.5);transition:transform .15s ease" style-hover="transform:translateY(-1px)">Download MP4</button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 320px;gap:26px;align-items:start;max-width:1100px">
+          <div>
+            <div style="position:relative;width:100%;aspect-ratio:{{ resultAspect }};border-radius:20px;overflow:hidden;background:{{ resultBg }};box-shadow:0 10px 30px -10px rgba(0,0,0,.16);display:flex;align-items:center;justify-content:center">
+              <sc-if value="{{ resultVideoUrl }}" hint-placeholder-val="{{ false }}">
+                {{ videoPlayer }}
+              </sc-if>
+              <sc-if value="{{ noResultVideoUrl }}" hint-placeholder-val="{{ true }}">
+                <span style="font-size:4rem;font-weight:500;color:rgba(15,23,42,.22)">{{ resultMono }}</span>
+              </sc-if>
+              <span style="position:absolute;left:18px;top:18px;padding:5px 12px;border-radius:20px;background:rgba(255,255,255,.92);font-size:.7rem;font-weight:600;color:#1e293b;pointer-events:none">{{ ratioLabel }}</span>
+              <sc-if value="{{ subsOn }}">
+                <span style="position:absolute;left:6%;right:6%;bottom:16%;display:flex;justify-content:center;pointer-events:none">
+                  <span style="padding:8px 16px;border-radius:10px;background:rgba(15,23,42,.82);color:#ffffff;font-size:.9rem;font-weight:500;line-height:1.4;text-align:center;text-wrap:pretty">{{ subtitleLine }}</span>
+                </span>
+              </sc-if>
+              <sc-if value="{{ noResultVideoUrl }}" hint-placeholder-val="{{ true }}">
+                <span style="position:absolute;left:0;right:0;bottom:0;height:44px;display:flex;align-items:center;gap:12px;padding:0 18px;background:linear-gradient(to top,rgba(0,0,0,.35),rgba(0,0,0,0))">
+                  <span style="font-size:.7rem;color:#ffffff">▶</span>
+                  <span style="flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.35);display:block;overflow:hidden"><span style="display:block;width:34%;height:100%;background:#ffffff;border-radius:2px"></span></span>
+                  <span style="font-size:.7rem;font-weight:500;color:#ffffff">{{ durText }}</span>
+                </span>
+              </sc-if>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap">
+              <sc-if value="{{ resultVideoUrl }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ toggleResultPlay }}" style="display:flex;align-items:center;gap:9px;padding:9px 20px;border:1px solid #0f172a;border-radius:16px;background:#0f172a;color:#ffffff;font-family:inherit;font-size:.8rem;font-weight:600;cursor:pointer;transition:transform .15s ease" style-hover="transform:translateY(-1px)">{{ playLabel }}</button>
+                <button onClick="{{ restartResult }}" style="display:flex;align-items:center;gap:9px;padding:9px 16px;border:1px solid #e2e8f0;border-radius:16px;background:#ffffff;font-family:inherit;font-size:.8rem;font-weight:600;color:#475569;cursor:pointer;transition:border-color .16s ease" style-hover="border-color:#0f172a;color:#0f172a">↺  Restart</button>
+              </sc-if>
+              <sc-for list="{{ versions }}" as="v" hint-placeholder-count="1">
+                <button onClick="{{ v.pick }}" style="display:flex;align-items:center;gap:9px;padding:9px 16px;border:1px solid {{ v.border }};border-radius:16px;background:{{ v.bg }};font-family:inherit;font-size:.8rem;font-weight:600;color:#1e293b;cursor:pointer;transition:border-color .16s ease" style-hover="border-color:#0f172a">
+                  <span style="width:26px;height:18px;border-radius:4px;background:{{ v.thumb }};display:block;flex:none"></span>{{ v.label }}
+                </button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <sc-if value="{{ savePrompt }}">
+              <div style="border:1px solid #0f172a;border-radius:20px;padding:22px;background:#ffffff;box-shadow:0 10px 30px -10px rgba(0,0,0,.12);animation:idxUp .3s ease both">
+                <div style="font-size:.9rem;font-weight:600;color:#1e293b;margin-bottom:6px">Save this as an avatar?</div>
+                <p style="font-size:.79rem;line-height:1.55;color:#64748b;margin-bottom:14px">Next time, one click gets you straight to the script.</p>
+                <input onChange="{{ onName }}" value="{{ avatarName }}" style="width:100%;padding:10px 14px;border:1px solid #e2e8f0;border-radius:12px;font-family:inherit;font-size:.85rem;color:#334155;outline:none;margin-bottom:12px" style-focus="border-color:#B567C2" />
+                <div style="display:flex;gap:8px">
+                  <button onClick="{{ saveAvatar }}" style="flex:1;padding:10px;border:1px solid #0f172a;border-radius:20px;background:#0f172a;color:#ffffff;font-family:inherit;font-size:.79rem;font-weight:600;cursor:pointer">Save</button>
+                  <button onClick="{{ dismissSave }}" style="padding:10px 16px;border:1px solid #e2e8f0;border-radius:20px;background:#ffffff;font-family:inherit;font-size:.79rem;font-weight:600;color:#64748b;cursor:pointer">Not now</button>
+                </div>
+              </div>
+            </sc-if>
+
+            <div style="border:1px solid #eef2f5;border-radius:20px;padding:22px;background:#F4F8F9">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+                <span style="font-size:.9rem;font-weight:600;color:#1e293b">Subtitles</span>
+                <button onClick="{{ toggleSubs }}" style="width:42px;height:24px;border-radius:14px;border:0;background:{{ subsTrack }};cursor:pointer;padding:3px;display:flex;justify-content:{{ subsJustify }};transition:background .2s ease">
+                  <span style="width:18px;height:18px;border-radius:50%;background:#ffffff;display:block;box-shadow:0 2px 5px rgba(0,0,0,.2)"></span>
+                </button>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:7px">
+                <sc-for list="{{ subLangs }}" as="s" hint-placeholder-count="3">
+                  <button onClick="{{ s.pick }}" style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border:1px solid {{ s.border }};border-radius:12px;background:{{ s.bg }};font-family:inherit;font-size:.8rem;font-weight:{{ s.weight }};color:#1e293b;cursor:pointer;text-align:left;transition:border-color .16s ease" style-hover="border-color:#0f172a">{{ s.label }}<span style="font-size:.72rem;color:#94a3b8">{{ s.check }}</span></button>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ lookMenu }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeLookMenu }}" style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:59"></div>
+      <div style="{{ lookMenuStyle }}display:flex;flex-direction:column;gap:2px;padding:6px;border:1px solid #eef2f5;border-radius:12px;background:#ffffff;box-shadow:0 14px 34px -12px rgba(15,23,42,.28);min-width:140px">
+        <button onClick="{{ renameLook }}" style="padding:8px 12px;border:0;border-radius:8px;background:transparent;text-align:left;font-family:inherit;font-size:.82rem;font-weight:600;color:#1e293b;cursor:pointer" style-hover="background:#F4F8F9">Rename</button>
+        <sc-if value="{{ lookMenuCanDelete }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ deleteLookFromMenu }}" style="padding:8px 12px;border:0;border-radius:8px;background:transparent;text-align:left;font-family:inherit;font-size:.82rem;font-weight:600;color:#b3403e;cursor:pointer" style-hover="background:#fff5f4">Delete</button>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isProjects }}">
+      <div style="padding:52px 46px;animation:idxUp .3s ease both">
+        <h1 style="font-size:1.8rem;font-weight:500;letter-spacing:-.025em;color:#0f172a;margin-bottom:8px">Projects</h1>
+        <p style="font-size:.98rem;color:#64748b;line-height:1.5;margin-bottom:26px">Every render lands here. Make folders to group them.</p>
+
+        <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:30px">
+          <sc-for list="{{ folderChips }}" as="fd" hint-placeholder-count="1">
+            <span style="display:flex;align-items:center;gap:5px">
+              <sc-if value="{{ fd.editing }}" hint-placeholder-val="{{ false }}">
+                <input onChange="{{ onFolderDraft }}" onBlur="{{ commitFolder }}" value="{{ folderDraft }}" style="width:150px;padding:7px 13px;border:1px solid #B567C2;border-radius:20px;font-family:inherit;font-size:.78rem;font-weight:600;color:#334155;outline:none" />
+              </sc-if>
+              <sc-if value="{{ fd.notEditing }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ fd.select }}" style="padding:7px 16px;border:1px solid {{ fd.border }};border-radius:20px;background:{{ fd.bg }};color:{{ fd.color }};font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .16s ease">{{ fd.label }}</button>
+                <sc-if value="{{ fd.showActions }}">
+                  <button onClick="{{ fd.startRename }}" style="padding:5px 9px;border:1px solid #e2e8f0;border-radius:14px;background:#ffffff;font-family:inherit;font-size:.66rem;font-weight:600;color:#64748b;cursor:pointer" style-hover="border-color:#B567C2;color:#B567C2">Rename</button>
+                  <button onClick="{{ fd.remove }}" style="padding:5px 9px;border:1px solid #e2e8f0;border-radius:14px;background:#ffffff;font-family:inherit;font-size:.66rem;font-weight:600;color:#64748b;cursor:pointer" style-hover="border-color:#F28482;color:#F28482">Delete</button>
+                </sc-if>
+              </sc-if>
+            </span>
+          </sc-for>
+          <button onClick="{{ newFolder }}" style="padding:7px 16px;border:1px dashed #cbd5e1;border-radius:20px;background:#ffffff;font-family:inherit;font-size:.78rem;font-weight:600;color:#475569;cursor:pointer" style-hover="border-color:#B567C2;color:#B567C2">+ New folder</button>
+        </div>
+
+        <h2 style="font-size:.95rem;font-weight:600;color:#1e293b;margin-bottom:16px">Recent projects</h2>
+        <sc-if value="{{ noVisibleProjects }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:34px 30px;border:1px dashed #e2e8f0;border-radius:20px;background:#F4F8F9;font-size:.88rem;color:#64748b;max-width:520px">Nothing here yet. Renders show up as soon as you generate a video.</div>
+        </sc-if>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:1060px">
+          <sc-for list="{{ visibleProjects }}" as="p" hint-placeholder-count="3">
+            <div style="position:relative;border:1px solid {{ p.cardRing }};border-radius:18px;overflow:hidden;background:#ffffff;box-shadow:0 10px 30px -10px rgba(0,0,0,.06);transition:border-color .16s ease">
+              <button onClick="{{ p.toggle }}" style="position:absolute;top:12px;left:12px;z-index:2;display:flex;align-items:center;justify-content:center;width:24px;height:24px;border:1px solid {{ p.tickBorder }};border-radius:7px;background:{{ p.tickBg }};color:{{ p.tickColor }};font-size:.7rem;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:0 2px 8px rgba(0,0,0,.14)">✓</button>
+              <button onClick="{{ p.open }}" style="display:flex;align-items:center;justify-content:center;width:100%;height:140px;border:0;padding:0;background:{{ p.bg }};cursor:pointer;font-family:inherit">
+                <sc-if value="{{ p.isRendering }}" hint-placeholder-val="{{ false }}">
+                  <span style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.92);box-shadow:0 4px 14px rgba(0,0,0,.12)">
+                    <span style="width:18px;height:18px;border-radius:50%;border:2px solid #e2e8f0;border-top-color:#B567C2;animation:idxSpin .7s linear infinite;display:block"></span>
+                  </span>
+                </sc-if>
+                <sc-if value="{{ p.isDone }}" hint-placeholder-val="{{ true }}">
+                  <span style="display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.9);font-size:.7rem;color:#0f172a;box-shadow:0 4px 14px rgba(0,0,0,.12)">▶</span>
+                </sc-if>
+                <sc-if value="{{ p.isFailed }}">
+                  <span style="padding:5px 12px;border-radius:20px;background:rgba(255,255,255,.94);font-size:.7rem;font-weight:600;color:#b3403e">Failed</span>
+                </sc-if>
+              </button>
+              <div style="padding:14px 16px;display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:.85rem;font-weight:600;color:#1e293b">{{ p.title }}</span>
+                <span style="font-size:.74rem;color:#94a3b8">{{ p.meta }}</span>
+                <span style="font-size:.72rem;font-weight:500;color:#B567C2">{{ p.folderLabel }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ hasSelection }}" hint-placeholder-val="{{ false }}">
+          <div style="position:fixed;left:calc(236px + 46px);right:46px;bottom:26px;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 20px;border:1px solid #0f172a;border-radius:20px;background:#ffffff;box-shadow:0 18px 44px -14px rgba(15,23,42,.4);animation:idxUp .2s ease both">
+            <span style="font-size:.85rem;font-weight:600;color:#1e293b">{{ selectionCount }}</span>
+            <div style="display:flex;align-items:center;gap:9px">
+              <sc-if value="{{ movePickerOpen }}" hint-placeholder-val="{{ false }}">
+                <span style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+                  <span style="font-size:.74rem;font-weight:600;color:#94a3b8">Move to</span>
+                  <sc-for list="{{ moveTargets }}" as="mt" hint-placeholder-count="1">
+                    <button onClick="{{ mt.pick }}" style="padding:7px 14px;border:1px solid #e2e8f0;border-radius:16px;background:#F4F8F9;font-family:inherit;font-size:.76rem;font-weight:600;color:#1e293b;cursor:pointer" style-hover="border-color:#B567C2;color:#B567C2">{{ mt.name }}</button>
+                  </sc-for>
+                </span>
+              </sc-if>
+              <button onClick="{{ openMove }}" style="padding:9px 18px;border:1px solid #0f172a;border-radius:18px;background:#0f172a;color:#ffffff;font-family:inherit;font-size:.79rem;font-weight:600;cursor:pointer;transition:transform .15s ease" style-hover="transform:translateY(-1px)">Move</button>
+              <button onClick="{{ deleteSelected }}" style="padding:9px 16px;border:1px solid #e2e8f0;border-radius:18px;background:#ffffff;font-family:inherit;font-size:.79rem;font-weight:600;color:#64748b;cursor:pointer" style-hover="border-color:#F28482;color:#F28482">Delete</button>
+              <button onClick="{{ clearSelection }}" style="padding:9px 14px;border:0;background:transparent;font-family:inherit;font-size:.79rem;font-weight:600;color:#94a3b8;cursor:pointer" style-hover="color:#0f172a">Cancel</button>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isLibrary }}">
+      <div style="padding:52px 46px;animation:idxUp .3s ease both">
+        <sc-if value="{{ inAvatarList }}" hint-placeholder-val="{{ true }}">
+          <h1 style="font-size:1.8rem;font-weight:500;letter-spacing:-.025em;color:#0f172a;margin-bottom:8px">Your avatars</h1>
+          <p style="font-size:.98rem;color:#64748b;line-height:1.5;margin-bottom:32px">Open an avatar to add clothing or pose variations, then pick one to start a video.</p>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1020px">
+            <sc-for list="{{ builtinAvatars }}" as="b" hint-placeholder-count="2">
+              <div style="border:1px solid #eef2f5;border-radius:20px;overflow:hidden;background:#ffffff;box-shadow:0 10px 30px -10px rgba(0,0,0,.08)">
+                <button onClick="{{ b.use }}" style="display:block;width:100%;height:190px;border:0;padding:0;background:{{ b.bg }};cursor:pointer;font-family:inherit"></button>
+                <div style="padding:18px 20px;display:flex;flex-direction:column;gap:10px">
+                  <div style="display:flex;flex-direction:column;gap:3px">
+                    <span style="font-size:.92rem;font-weight:600;color:#1e293b">{{ b.name }}</span>
+                    <span style="font-size:.77rem;color:#64748b">{{ b.lookCount }} · Built in</span>
+                  </div>
+                  <button onClick="{{ b.use }}" style="width:100%;padding:9px;border:1px solid #0f172a;border-radius:20px;background:#0f172a;color:#ffffff;font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer">Use</button>
+                </div>
+              </div>
+            </sc-for>
+            <sc-for list="{{ saved }}" as="a" hint-placeholder-count="2">
+              <div style="border:1px solid #eef2f5;border-radius:20px;overflow:hidden;background:#ffffff;box-shadow:0 10px 30px -10px rgba(0,0,0,.08)">
+                <button onClick="{{ a.open }}" style="display:block;width:100%;height:190px;border:0;padding:0;background:{{ a.bg }};cursor:pointer;font-family:inherit"></button>
+                <div style="padding:18px 20px;display:flex;flex-direction:column;gap:10px">
+                  <div style="display:flex;flex-direction:column;gap:3px">
+                    <span style="font-size:.92rem;font-weight:600;color:#1e293b">{{ a.name }}</span>
+                    <span style="font-size:.77rem;color:#64748b">{{ a.lookCount }} · {{ a.voice }}</span>
+                  </div>
+                  <div style="display:flex;gap:8px">
+                    <button onClick="{{ a.open }}" style="flex:1;padding:9px;border:1px solid #0f172a;border-radius:20px;background:#0f172a;color:#ffffff;font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer">Edit</button>
+                    <button onClick="{{ a.remove }}" style="padding:9px 14px;border:1px solid #e2e8f0;border-radius:20px;background:#ffffff;font-family:inherit;font-size:.78rem;font-weight:600;color:#64748b;cursor:pointer;transition:all .16s ease" style-hover="border-color:#F28482;color:#F28482">Delete</button>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+            <button onClick="{{ addAvatarFromLibrary }}" style="aspect-ratio:210/190;height:190px;border:1px dashed #cbd5e1;border-radius:20px;background:#ffffff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-family:inherit;transition:border-color .18s ease" style-hover="border-color:#B567C2">
+              <span style="font-size:1.4rem;color:#a855f7;line-height:1">✦</span>
+              <span style="font-size:.85rem;font-weight:600;color:#1e293b">New avatar</span>
+              <span style="font-size:.73rem;color:#94a3b8">Upload a photo</span>
+            </button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ inAvatarDetail }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ backToAvatars }}" style="margin-bottom:20px;padding:8px 16px;border:1px solid #e2e8f0;border-radius:20px;background:#ffffff;font-family:inherit;font-size:.78rem;font-weight:600;color:#475569;cursor:pointer" style-hover="border-color:#B567C2;color:#B567C2">← All avatars</button>
+          <h1 style="font-size:1.8rem;font-weight:500;letter-spacing:-.025em;color:#0f172a;margin-bottom:8px">{{ detailName }}</h1>
+          <p style="font-size:.98rem;color:#64748b;line-height:1.5;margin-bottom:28px">Click a look to start a video with it, or add another outfit or pose.</p>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;max-width:1060px">
+            <sc-for list="{{ detailLooks }}" as="l" hint-placeholder-count="2">
+              <div style="position:relative;border-radius:20px;overflow:hidden;box-shadow:0 10px 30px -10px rgba(0,0,0,.1)">
+                <button onClick="{{ l.use }}" onContextMenu="{{ l.menu }}" style="display:block;width:100%;aspect-ratio:2/3;border:0;padding:0;background:{{ l.bg }};cursor:pointer;font-family:inherit;transition:transform .18s ease" style-hover="transform:translateY(-3px)">
+                  <span style="position:absolute;left:0;right:0;bottom:0;padding:26px 16px 14px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.6));font-size:.82rem;font-weight:600;color:#ffffff;text-align:left">{{ l.label }}</span>
+                </button>
+                <button onClick="{{ l.remove }}" style="position:absolute;top:10px;right:10px;width:26px;height:26px;border:0;border-radius:50%;background:rgba(255,255,255,.92);font-family:inherit;font-size:.72rem;font-weight:600;color:#64748b;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.16)" style-hover="color:#F28482">×</button>
+              </div>
+            </sc-for>
+            <button onClick="{{ addLook }}" style="aspect-ratio:2/3;border:1px dashed #cbd5e1;border-radius:20px;background:#ffffff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-family:inherit;transition:border-color .18s ease" style-hover="border-color:#B567C2">
+              <sc-if value="{{ addingLook }}" hint-placeholder-val="{{ false }}">
+                <span style="width:18px;height:18px;border-radius:50%;border:2px solid #e2e8f0;border-top-color:#B567C2;animation:idxSpin .7s linear infinite;display:block"></span>
+              </sc-if>
+              <sc-if value="{{ notAddingLook }}" hint-placeholder-val="{{ true }}">
+                <span style="font-size:1.3rem;color:#a855f7;line-height:1">↑</span>
+                <span style="font-size:.85rem;font-weight:600;color:#1e293b">Add a look</span>
+                <span style="font-size:.73rem;color:#94a3b8">Outfit or pose</span>
+              </sc-if>
+            </button>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+  </main>
+
+    <sc-if value="{{ namePrompt }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,.42);animation:idxIn .2s ease both">
+        <div style="width:420px;border:1px solid #eef2f5;border-radius:24px;background:#ffffff;padding:26px;box-shadow:0 28px 60px -18px rgba(15,23,42,.5);animation:idxUp .25s ease both">
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+            <span style="width:70px;height:92px;border-radius:14px;background:{{ pendingImgBg }};flex:none;box-shadow:0 6px 18px -8px rgba(0,0,0,.3)"></span>
+            <span style="display:flex;flex-direction:column;gap:4px">
+              <span style="font-size:1.05rem;font-weight:600;color:#1e293b">Name this avatar</span>
+              <span style="font-size:.8rem;line-height:1.5;color:#64748b">It goes into your avatar library, where you can add more outfits and poses later.</span>
+            </span>
+          </div>
+          <input onChange="{{ onNewAvatarName }}" value="{{ newAvatarName }}" placeholder="e.g. Sarah — brand host" style="width:100%;padding:12px 16px;border:1px solid #e2e8f0;border-radius:14px;font-family:inherit;font-size:.9rem;color:#334155;outline:none;margin-bottom:16px" style-focus="border-color:#B567C2" />
+          <sc-if value="{{ nameError }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:11px 15px;border:1px solid #F28482;border-radius:14px;background:#fff5f4;font-size:.78rem;line-height:1.5;color:#b3403e;margin-bottom:14px">{{ nameError }}</div>
+          </sc-if>
+          <div style="display:flex;gap:9px">
+            <button onClick="{{ confirmNewAvatar }}" style="flex:1;padding:11px;border:1px solid #0f172a;border-radius:20px;background:#0f172a;color:#ffffff;font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer">{{ saveAvatarLabel }}</button>
+            <button onClick="{{ cancelNewAvatar }}" style="padding:11px 18px;border:1px solid #e2e8f0;border-radius:20px;background:#ffffff;font-family:inherit;font-size:.82rem;font-weight:600;color:#64748b;cursor:pointer">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ renamingBg }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,.42);animation:idxIn .2s ease both">
+        <div style="width:380px;border:1px solid #eef2f5;border-radius:24px;background:#ffffff;padding:26px;box-shadow:0 28px 60px -18px rgba(15,23,42,.5);animation:idxUp .25s ease both">
+          <div style="font-size:1.05rem;font-weight:600;color:#1e293b;margin-bottom:16px">Rename background</div>
+          <input onChange="{{ onRenameBgDraft }}" value="{{ renameBgDraft }}" placeholder="Background name" style="width:100%;padding:12px 16px;border:1px solid #e2e8f0;border-radius:14px;background:#F4F8F9;font-family:inherit;font-size:.88rem;color:#0f172a;margin-bottom:16px" />
+          <div style="display:flex;gap:9px">
+            <button onClick="{{ saveRenameBg }}" style="flex:1;padding:11px;border:1px solid #0f172a;border-radius:20px;background:#0f172a;color:#ffffff;font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer">Save</button>
+            <button onClick="{{ cancelRenameBg }}" style="padding:11px 18px;border:1px solid #e2e8f0;border-radius:20px;background:#ffffff;font-family:inherit;font-size:.82rem;font-weight:600;color:#475569;cursor:pointer">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ confirmBg }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,.42);animation:idxIn .2s ease both">
+        <div style="width:360px;border:1px solid #eef2f5;border-radius:24px;background:#ffffff;padding:26px;box-shadow:0 28px 60px -18px rgba(15,23,42,.5);animation:idxUp .25s ease both">
+          <div style="font-size:1.05rem;font-weight:600;color:#1e293b;margin-bottom:8px">Delete "{{ confirmBgName }}"?</div>
+          <div style="font-size:.85rem;line-height:1.5;color:#64748b;margin-bottom:22px">This can't be undone.</div>
+          <div style="display:flex;gap:9px">
+            <button onClick="{{ confirmDeleteBg }}" style="flex:1;padding:11px;border:1px solid #F28482;border-radius:20px;background:#F28482;color:#ffffff;font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer">Delete</button>
+            <button onClick="{{ cancelDeleteBg }}" style="padding:11px 18px;border:1px solid #e2e8f0;border-radius:20px;background:#ffffff;font-family:inherit;font-size:.82rem;font-weight:600;color:#475569;cursor:pointer">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;autoAdvance&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behaviour&quot;},&quot;pricePerMinute&quot;:{&quot;editor&quot;:&quot;float&quot;,&quot;default&quot;:1.2,&quot;min&quot;:0.2,&quot;max&quot;:10,&quot;step&quot;:0.1,&quot;unit&quot;:&quot;$&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Behaviour&quot;},&quot;defaultRatio&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;16:9&quot;,&quot;9:16&quot;,&quot;1:1&quot;,&quot;4:5&quot;],&quot;default&quot;:&quot;16:9&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Behaviour&quot;}}">
+const GRADS = [
+  'radial-gradient(circle at 50% 8%, #FFB347 0%, #F9ED96 34%, #F4F8F9 68%)',
+  'radial-gradient(circle at 50% 8%, #E5A1F5 0%, #F8ACA0 34%, #F4F8F9 68%)',
+  'radial-gradient(circle at 50% 8%, #F9ED96 0%, #E5A1F5 34%, #F4F8F9 68%)',
+  'radial-gradient(circle at 50% 8%, #F5C344 0%, #F28482 34%, #F4F8F9 68%)',
+  'radial-gradient(circle at 50% 8%, #B567C2 0%, #F8ACA0 34%, #F4F8F9 68%)',
+  'radial-gradient(circle at 50% 8%, #F28482 0%, #F9ED96 34%, #F4F8F9 68%)',
+  'radial-gradient(circle at 50% 8%, #A3C4E8 0%, #E5A1F5 34%, #F4F8F9 68%)'
+];
+const BUILTIN_PATHS = [
+  './assets/becky-white-shirt-skirt-studio.png', './assets/becky-white-shirt-skirt-office.png', './assets/becky-white-shirt-skirt-home.png',
+  './assets/becky-charcoal-blazer-studio.png', './assets/becky-charcoal-blazer-office.png', './assets/becky-charcoal-blazer-home.png',
+  './assets/becky-navy-suit-studio.png', './assets/becky-navy-suit-office.png', './assets/becky-navy-suit-home.png',
+  './assets/avery-tech-blazer-studio.png', './assets/avery-tech-blazer-front.png'
+];
+// office/home for this look are AI-generated (Nano Banana) from the studio photo, so the same
+// outfit carries through — only the background differs.
+const OUTFITS = [
+  { id: 'o1', name: 'White shirt & pencil skirt', studio: './assets/becky-white-shirt-skirt-studio.png', office: 'https://platform2.cdn.acedata.cloud/nanobanana/8dab35dc-2117-48ad-b585-955c64b2674c.png', home: 'https://platform2.cdn.acedata.cloud/nanobanana/64c956c4-bba7-4014-8335-ede164804e82.png' },
+  { id: 'o2', name: 'Charcoal blazer', studio: './assets/becky-charcoal-blazer-studio.png', office: 'https://platform2.cdn.acedata.cloud/nanobanana/f29f6314-2b10-49ae-8e59-4e7b81d71a7f.png', home: 'https://platform2.cdn.acedata.cloud/nanobanana/1a16af18-4eb3-4fbf-82c5-84be3e44f7cb.png' },
+  { id: 'o3', name: 'Navy suit', studio: './assets/becky-navy-suit-studio.png', office: 'https://platform2.cdn.acedata.cloud/nanobanana/9432d2e3-dc02-4fde-9997-befbd5382ad7.png', home: 'https://platform2.cdn.acedata.cloud/nanobanana/f7275d84-d41b-4150-a539-389bc7869e59.png' }
+];
+const AVERY_LOOKS = [
+  { id: 'a1', name: 'Holding tablet', thumb: './assets/avery-tech-blazer-studio.png' },
+  { id: 'a2', name: 'Facing camera', thumb: './assets/avery-tech-blazer-front.png' }
+];
+const FACES = [
+  { id: 'f1', name: 'Ada', mono: 'A' }, { id: 'f2', name: 'Ray', mono: 'R' },
+  { id: 'f3', name: 'Mei', mono: 'M' }, { id: 'f4', name: 'Jonas', mono: 'J' },
+  { id: 'f5', name: 'Priya', mono: 'P' }, { id: 'f6', name: 'Tomás', mono: 'T' },
+  { id: 'f7', name: 'Lin', mono: 'L' }
+];
+const BGS = [
+  { id: 'b0', name: 'Keep original' }, { id: 'b1', name: 'Soft studio' },
+  { id: 'b2', name: 'Open office' }, { id: 'b3', name: 'Warm gradient' },
+  { id: 'b4', name: 'Brand violet' }, { id: 'b5', name: 'Bookshelf' }
+];
+const VOICES = [
+  { id: 'v1', name: 'Gentle Lady', desc: 'Cantonese · woman · warm', lang: 'yue', voiceId: 'Cantonese_GentleLady' },
+  { id: 'v2', name: 'Cute Girl', desc: 'Cantonese · girl · upbeat', lang: 'yue', voiceId: 'Cantonese_CuteGirl' },
+  { id: 'v3', name: 'Professional Host (F)', desc: 'Cantonese · woman · presenter', lang: 'yue', voiceId: 'Cantonese_ProfessionalHost（F)' },
+  { id: 'v4', name: 'Professional Host (M)', desc: 'Cantonese · man · presenter', lang: 'yue', voiceId: 'Cantonese_ProfessionalHost（M)' },
+  { id: 'v5', name: 'Playful Man', desc: 'Cantonese · man · lively', lang: 'yue', voiceId: 'Cantonese_PlayfulMan' },
+  { id: 'v6', name: 'Kind Women', desc: 'Cantonese · woman · gentle', lang: 'yue', voiceId: 'Cantonese_KindWomen' },
+  { id: 'v7', name: 'Sweet Lady', desc: 'Mandarin · woman · conversational', lang: 'zh', voiceId: 'Chinese (Mandarin)_Sweet_Lady' },
+  { id: 'v8', name: 'Male Announcer', desc: 'Mandarin · man · news read', lang: 'zh', voiceId: 'Chinese (Mandarin)_Male_Announcer' },
+  { id: 'v9', name: 'Gentleman', desc: 'Mandarin · man · steady', lang: 'zh', voiceId: 'Chinese (Mandarin)_Gentleman' },
+  { id: 'v10', name: 'Warm Girl', desc: 'Mandarin · girl · friendly', lang: 'zh', voiceId: 'Chinese (Mandarin)_Warm_Girl' },
+  { id: 'v11', name: 'Radio Host', desc: 'Mandarin · man · broadcast', lang: 'zh', voiceId: 'Chinese (Mandarin)_Radio_Host' },
+  { id: 'v12', name: 'Refreshing Young Man', desc: 'Mandarin · man · bright', lang: 'zh', voiceId: 'Chinese (Mandarin)_Refreshing_Young_Man' },
+  { id: 'v13', name: 'News Anchor', desc: 'Mandarin · woman · formal', lang: 'zh', voiceId: 'Chinese (Mandarin)_News_Anchor' },
+  { id: 'v14', name: 'Wise Women', desc: 'Mandarin · woman · mature', lang: 'zh', voiceId: 'Chinese (Mandarin)_Wise_Women' },
+  { id: 'v15', name: 'Calm Woman', desc: 'English · woman · neutral corporate', lang: 'en', voiceId: 'English_CalmWoman' },
+  { id: 'v16', name: 'Radiant Girl', desc: 'English · girl · bright', lang: 'en', voiceId: 'English_radiant_girl' },
+  { id: 'v17', name: 'Deep-Voiced Gentleman', desc: 'English · man · deep, unhurried', lang: 'en', voiceId: 'English_Deep-VoicedGentleman' },
+  { id: 'v18', name: 'Expressive Narrator', desc: 'English · man · storytelling', lang: 'en', voiceId: 'English_expressive_narrator' },
+  { id: 'v19', name: 'Graceful Lady', desc: 'English · woman · elegant', lang: 'en', voiceId: 'English_Graceful_Lady' },
+  { id: 'v20', name: 'Trustworthy Man', desc: 'English · man · reassuring', lang: 'en', voiceId: 'English_Trustworth_Man' },
+  { id: 'v21', name: 'Upbeat Woman', desc: 'English · woman · energetic', lang: 'en', voiceId: 'English_UpsetGirl' },
+  { id: 'v22', name: 'Wise Lady', desc: 'English · woman · calm authority', lang: 'en', voiceId: 'English_Wiselady' },
+  { id: 'v23', name: 'Reserved Young Man', desc: 'English · man · soft-spoken', lang: 'en', voiceId: 'English_ReservedYoungMan' },
+  { id: 'v24', name: 'Magnetic-Voiced Man', desc: 'English · man · rich tone', lang: 'en', voiceId: 'English_magnetic_voiced_man' }
+];
+const SAMPLE_TEXT = {
+  yue: '你好，我係你嘅 AI 主播，好高興見到你。',
+  zh: '你好，我是你的 AI 主播，很高兴见到你。',
+  en: 'Hi, I am your AI presenter. It is good to meet you.'
+};
+const BOOST = { yue: 'Chinese,Yue', zh: 'Chinese', en: 'English' };
+const LANGS = [{ id: 'yue', label: 'Cantonese' }, { id: 'zh', label: 'Mandarin' }, { id: 'en', label: 'English' }];
+const MODELS = ['speech-2.8-hd', 'speech-2.8-turbo', 'speech-2.6-hd', 'speech-2.6-turbo', 'speech-02-hd', 'speech-02-turbo'];
+const SCRIPTS = {
+  en: "Good morning everyone. Three things went well this quarter: we shipped the new onboarding, we cut support response time in half, and we grew revenue eleven percent. One thing is changing — from Monday, every team writes a one-page weekly note.",
+  zh: "早上好,各位。这个季度有三件事进展顺利:我们上线了新的引导流程,把客服响应时间缩短了一半,收入增长了百分之十一。有一件事要改变——从周一开始,每个团队都要写一份一页纸的周报。",
+  yue: "早晨,各位。今個季度有三件事做得幾好:我哋上咗新嘅引導流程,將客戶支援回應時間減咗一半,收入增長咗百分之十一。有一樣嘢要改變——由星期一開始,每個團隊都要寫一份一頁嘅週報。"
+};
+const SUBS = [{ id: 'tc', label: 'Traditional Chinese' }, { id: 'sc', label: 'Simplified Chinese' }, { id: 'en', label: 'English' }];
+const RATIOS = [
+  { id: '16:9', label: '16:9', use: 'Landscape', w: 232, h: 130 },
+  { id: '9:16', label: '9:16', use: 'Vertical', w: 110, h: 196 },
+  { id: '1:1', label: '1:1', use: 'Square', w: 168, h: 168 },
+  { id: '4:5', label: '4:5', use: 'Instagram', w: 148, h: 185 }
+];
+const STAGES = ['Synthesising the voice', 'Animating the portrait', 'Matching the lips', 'Rendering the final cut'];
+const SEED = "Good morning everyone. Three things went well this quarter: we shipped the new onboarding, we cut support response time in half, and we grew revenue eleven percent. One thing is changing — from Monday, every team writes a one-page weekly note.";
+
+class Component extends DCLogic {
+  state = {
+    screen: 'dashboard', face: null, bg: null, voice: null,
+    script: SCRIPTS.en, lang: 'en', customScript: false, ratio: null,
+    recording: false, recSec: 0, training: false, merging: false,
+    faceImg: null, bgImg: null, mergedImg: null, mergeError: '', outfit: null, outfitBg: null, facePage: 'select', builtinChoice: 'becky', builtin: null,
+    ttsModel: 'speech-2.8-hd', lipsyncAudio: null, lipsyncAudioName: '',
+    genError: '', resultVideoUrl: '',
+    creditState: 'idle', falBalance: null,
+    voiceFilter: 'all', sampling: '', playing: '',
+    previewing: false, stage: -1, progress: 0,
+    subsOn: true, subLang: 'en', savePrompt: false, avatarName: '',
+    version: 'orig', minutes: 42, resolution: '1080p',
+    saved: [], projects: [], clonedVoices: [], builtinUrls: {},
+    folders: [], folderFilter: 'all', editingFolder: '', folderDraft: '',
+    builtinLooks: { becky: [], avery: [] }, addingBuiltinLook: false,
+    lookMenu: null, nameOverrides: {},
+    selected: [], movePicker: false,
+    namePrompt: false, pendingImg: '', newAvatarName: '', libraryAvatar: null, addingLook: false,
+    voiceNames: {}, editingVoice: '', voiceDraft: '', activeProject: '',
+    bgLibrary: [], addingBg: false, composePreview: false, confirmBg: null,
+    renamingBg: null, renameBgDraft: ''
+  };
+
+  async downloadVideo() {
+    const url = this.state.resultVideoUrl;
+    if (!url) return;
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const objUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = objUrl; a.download = 'avatar-video.mp4';
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(objUrl);
+    } catch (e) {
+      window.open(url, '_blank');
+    }
+  }
+
+  componentDidMount() {
+    this.loadPersisted();
+    this.loadClonedVoices();
+    this.ensureBuiltinAssets();
+    this.startWatcher();
+    this.refreshHeygenQuota();
+    this._quotaTimer = setInterval(() => this.refreshHeygenQuota(), 60000);
+    window.addEventListener('storage', this.onExternalStore);
+  }
+
+  // Avatars, projects, folders and cloned-voice nicknames survive a reload.
+  loadPersisted() {
+    try {
+      const raw = this.readStore();
+      const d = raw.draft;
+      // readStore already normalised interrupted renders — write that back so disk stops lying.
+      this.writeStore(raw);
+      this.setState({
+        saved: raw.saved, projects: raw.projects,
+        folders: raw.folders, voiceNames: raw.voiceNames,
+        builtinLooks: raw.builtinLooks || { becky: [], avery: [] },
+        nameOverrides: raw.nameOverrides || {},
+        bgLibrary: raw.bgLibrary,
+        // Only hosted (http) image URLs are restored — a blob: URL from a previous session is dead.
+        faceImg: d.faceImg || null, mergedImg: d.mergedImg || null,
+        outfit: d.outfit ?? null, outfitBg: d.outfitBg || null, builtin: d.builtin || null,
+        builtinChoice: d.builtinChoice || 'becky',
+        voice: d.voice || null, voiceId: d.voiceId || null,
+        script: d.script || SCRIPTS.en, lang: d.lang || 'en', customScript: !!d.customScript,
+        ratio: d.ratio || null, resolution: d.resolution || '1080p', ttsModel: d.ttsModel || 'speech-2.8-hd'
+      });
+    } catch (e) {}
+  }
+
+  static STORE = 'indexAvatarStore_v1';
+
+  // A job only counts as live if THIS view is polling it; anything else marked "rendering" on disk
+  // is a leftover from a page that went away, so its spinner can never resolve.
+  normaliseProjects(list) {
+    const live = this._activeJobs || (this._activeJobs = new Set());
+    return (list || []).map(p => (p.status === 'rendering' && !live.has(p.id))
+      ? { ...p, status: 'failed', meta: 'Interrupted by a page reload' }
+      : p);
+  }
+
+  readStore() {
+    let raw = {};
+    try { raw = JSON.parse(localStorage.getItem(Component.STORE) || '{}'); } catch (e) {}
+    raw.projects = raw.projects || []; raw.folders = raw.folders || [];
+    raw.saved = raw.saved || []; raw.voiceNames = raw.voiceNames || {}; raw.draft = raw.draft || {};
+    raw.bgLibrary = raw.bgLibrary || BGS.slice(1).map(b => ({ id: b.id, name: b.name, url: null }));
+    raw.nameOverrides = raw.nameOverrides || {};
+    raw.builtinLooks = raw.builtinLooks || { becky: [], avery: [] };
+    raw.projects = this.normaliseProjects(raw.projects);
+    // Give legacy avatar records a real looks array once, so an emptied list stays empty.
+    raw.saved = raw.saved.map(a => Array.isArray(a.looks) ? a : { ...a, looks: this.looksOf(a) });
+    return raw;
+  }
+
+  writeStore(store) {
+    try { localStorage.setItem(Component.STORE, JSON.stringify(store)); } catch (e) {}
+  }
+
+  // Every change to a shared collection is a read-modify-write against what is CURRENTLY on disk,
+  // so a second open view can never dump its stale array back and resurrect deleted records.
+  mutate(fn) {
+    const store = this.readStore();
+    fn(store);
+    this.writeStore(store);
+    this.setState({ projects: store.projects, folders: store.folders, saved: store.saved, voiceNames: store.voiceNames, bgLibrary: store.bgLibrary, builtinLooks: store.builtinLooks, nameOverrides: store.nameOverrides });
+  }
+
+  // Only this view's own draft and voice nicknames — never the shared collections.
+  persist = () => {
+    const s = this.state;
+    const hosted = u => (u && /^https?:\/\//i.test(u)) ? u : null;
+    const store = this.readStore();
+    store.voiceNames = s.voiceNames;
+    store.draft = {
+      faceImg: hosted(s.faceImg), mergedImg: hosted(s.mergedImg),
+      outfit: s.outfit, outfitBg: s.outfitBg, builtin: s.builtin, builtinChoice: s.builtinChoice,
+      voice: s.voice, voiceId: s.voiceId, script: s.script, lang: s.lang,
+      customScript: s.customScript, ratio: s.ratio, resolution: s.resolution, ttsModel: s.ttsModel
+    };
+    this.writeStore(store);
+  };
+
+  // Another tab or preview changed things — pick up its collections instead of fighting it.
+  onExternalStore = e => {
+    if (e.key && e.key !== Component.STORE) return;
+    const store = this.readStore();
+    this.setState({ projects: store.projects, folders: store.folders, saved: store.saved });
+  };
+
+  // Any state change worth remembering routes through here.
+  save(patch) {
+    this.setState(patch, this.persist);
+  }
+
+  // One low-frequency watcher: keeps the draft saved and switches the native video controls on.
+  startWatcher() {
+    clearInterval(this._w);
+    this._w = setInterval(() => {
+      const s = this.state;
+      const sig = JSON.stringify([s.faceImg, s.mergedImg, s.outfit, s.outfitBg, s.builtin, s.builtinChoice,
+        s.voice, s.voiceId, s.script, s.lang, s.ratio, s.resolution, s.ttsModel,
+        s.voiceNames]);
+      if (this._sig === undefined) { this._sig = sig; return; }
+      if (sig !== this._sig) { this._sig = sig; this.persist(); }
+    }, 700);
+  }
+
+  updateProject(id, patch) {
+    this.mutate(st => { st.projects = st.projects.map(p => p.id === id ? { ...p, ...patch } : p); });
+  }
+
+  openProject(p) {
+    if (p.status !== 'done') return;
+    this.setState({ screen: 'result', resultVideoUrl: p.videoUrl, mergedImg: p.thumb || null, ratio: p.ratio || this.state.ratio, savePrompt: false, openTitle: p.title });
+  }
+
+  toggleSelect(id) {
+    this.setState(s => ({
+      selected: s.selected.includes(id) ? s.selected.filter(x => x !== id) : s.selected.concat([id]),
+      movePicker: false
+    }));
+  }
+
+  moveSelected(folderId) {
+    const ids = this.state.selected;
+    this.mutate(st => { st.projects = st.projects.map(p => ids.includes(p.id) ? { ...p, folder: folderId } : p); });
+    this.setState({ selected: [], movePicker: false });
+  }
+
+  deleteSelected() {
+    const ids = this.state.selected;
+    this.mutate(st => { st.projects = st.projects.filter(p => !ids.includes(p.id)); });
+    this.setState({ selected: [], movePicker: false });
+  }
+
+  addFolder() {
+    const id = 'f' + Date.now();
+    this.mutate(st => { st.folders = st.folders.concat([{ id, name: 'New folder' }]); });
+    this.setState({ editingFolder: id, folderDraft: 'New folder' });
+  }
+
+  commitFolderName() {
+    const { editingFolder, folderDraft } = this.state;
+    if (!editingFolder) return;
+    this.mutate(st => {
+      st.folders = st.folders.map(f => f.id === editingFolder ? { ...f, name: folderDraft.trim() || f.name } : f);
+    });
+    this.setState({ editingFolder: '', folderDraft: '' });
+  }
+
+  removeFolder(id) {
+    this.mutate(st => {
+      st.folders = st.folders.filter(f => f.id !== id);
+      st.projects = st.projects.map(p => p.folder === id ? { ...p, folder: '' } : p);
+    });
+    this.setState(s => ({ folderFilter: s.folderFilter === id ? 'all' : s.folderFilter }));
+  }
+
+  commitVoiceName() {
+    const { editingVoice, voiceDraft } = this.state;
+    if (!editingVoice) return;
+    const name = voiceDraft.trim();
+    this.setState(s => ({
+      voiceNames: name ? { ...s.voiceNames, [editingVoice]: name } : s.voiceNames,
+      editingVoice: '', voiceDraft: ''
+    }), this.persist);
+  }
+
+  async deleteClonedVoice(voiceId) {
+    this.setState(s => ({
+      clonedVoices: s.clonedVoices.filter(v => v.voiceId !== voiceId),
+      voiceId: s.voiceId === voiceId ? null : s.voiceId,
+      voice: s.voiceId === voiceId ? null : s.voice
+    }));
+    try {
+      await fetch('https://api.minimax.io/v1/delete_voice', {
+        method: 'POST',
+        headers: { authorization: 'Bearer ' + Component.MINIMAX_KEY, 'content-type': 'application/json' },
+        body: JSON.stringify({ voice_type: 'voice_cloning', voice_id: voiceId })
+      });
+    } catch (e) {}
+  }
+
+  // Becky/Avery reference photos live in Supabase Storage, not baked into the app — this
+  // uploads each local asset once (cached in localStorage) and swaps the picker thumbnails
+  // over to the hosted URL.
+  async ensureBuiltinAssets() {
+    const cacheKey = 'builtinAssetUrls_v1';
+    try {
+      const cached = JSON.parse(localStorage.getItem(cacheKey) || '{}');
+      if (BUILTIN_PATHS.every(p => cached[p])) { this.setState({ builtinUrls: cached }); return; }
+    } catch (e) {}
+    const sb = this.getSupabase();
+    if (!sb) return;
+    const urls = {};
+    for (const path of BUILTIN_PATHS) {
+      try {
+        const res = await fetch(path);
+        const blob = await res.blob();
+        const name = path.split('/').pop();
+        const { error } = await sb.storage.from('avatars').upload('builtin/' + name, blob, { contentType: blob.type || 'image/png', upsert: true });
+        if (!error) {
+          const { data } = sb.storage.from('avatars').getPublicUrl('builtin/' + name);
+          if (data && data.publicUrl) urls[path] = data.publicUrl;
+        }
+      } catch (e) {}
+    }
+    if (Object.keys(urls).length) {
+      this.setState(s => ({ builtinUrls: { ...s.builtinUrls, ...urls } }));
+      try { localStorage.setItem(cacheKey, JSON.stringify({ ...urls })); } catch (e) {}
+    }
+  }
+
+  assetUrl(path) { return this.state.builtinUrls[path] || path; }
+
+  // Pulls the real balance from HeyGen's own quota endpoint instead of a locally-guessed counter,
+  // so "minutes left" always matches the HeyGen account.
+  async refreshHeygenQuota() {
+    try {
+      const res = await fetch('https://api.heygen.com/v2/user/remaining_quota', {
+        headers: { 'x-api-key': Component.HEYGEN_KEY }
+      });
+      const data = await res.json();
+      // remaining_quota is in seconds of API credit.
+      const credits = data && data.data && typeof data.data.remaining_quota === 'number' ? data.data.remaining_quota : null;
+      if (credits != null) this.setState({ heygenCredits: credits, quotaError: '' });
+      else this.setState({ quotaError: 'Could not read HeyGen quota' });
+    } catch (e) {
+      this.setState({ quotaError: 'Could not reach HeyGen' });
+    }
+  }
+
+  // Built here rather than in the template: React owns `controls` as a boolean prop and resets it
+  // on every re-render, so the attribute has to come from the element definition itself.
+  videoPlayer() {
+    const url = this.state.resultVideoUrl;
+    if (!url) return null;
+    return React.createElement('video', {
+      key: url, src: url, controls: true, playsInline: true, preload: 'metadata',
+      ref: el => { this._video = el; },
+      onPlay: () => this.setState({ resultPlaying: true }),
+      onPause: () => this.setState({ resultPlaying: false }),
+      onEnded: () => this.setState({ resultPlaying: false }),
+      style: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain' }
+    });
+  }
+
+  toggleResultPlay() {
+    const v = this._video || document.querySelector('video');
+    if (!v) return;
+    if (v.paused) v.play().catch(() => {}); else v.pause();
+  }
+
+  restartResult() {
+    const v = this._video || document.querySelector('video');
+    if (!v) return;
+    v.currentTime = 0;
+    v.play().catch(() => {});
+  }
+
+  async loadClonedVoices() {
+    try {
+      const res = await fetch('https://api.minimax.io/v1/get_voice', {
+        method: 'POST',
+        headers: { authorization: 'Bearer ' + Component.MINIMAX_KEY, 'content-type': 'application/json' },
+        body: JSON.stringify({ voice_type: 'voice_cloning' })
+      });
+      const data = await res.json();
+      const list = data.voice_cloning || data.voice_cloning_list || [];
+      if (Array.isArray(list) && list.length) {
+        this.setState({ clonedVoices: list.map(v => ({ voiceId: v.voice_id, name: v.voice_name || v.voice_id })) });
+      }
+    } catch (e) {}
+  }
+
+  componentWillUnmount() {
+    clearInterval(this._t); clearInterval(this._r); clearInterval(this._w); clearInterval(this._quotaTimer);
+    window.removeEventListener('storage', this.onExternalStore);
+    this.stopPreview();
+  }
+
+  static API_KEY = '48f16c17ebfa45ffa959415d7acec722';
+  static HEYGEN_KEY = 'sk_V2_hgu_kgpdYQQlTYd_enf0aTUMm6HJYfKJrL9d5KmXlXlTUZJh';
+  static HEYGEN_GROUP_ID = '9ab711bddf82414ab5765b2c3a1dce40';
+
+  // Uploads the photo as a new Look under the one shared Avatar Group (looks aren't capped like
+  // standalone Photo Avatars are), then polls until the look is ready and confirms it supports Avatar V.
+  async getOrCreateAvatarVLook(imageUrl) {
+    const imgRes = await fetch(imageUrl);
+    const blob = await imgRes.blob();
+    const upRes = await fetch('https://upload.heygen.com/v1/asset', {
+      method: 'POST',
+      headers: { 'x-api-key': Component.HEYGEN_KEY, 'content-type': blob.type || 'image/png' },
+      body: blob
+    });
+    const upData = await upRes.json();
+    const imageKey = upData.data && upData.data.image_key;
+    if (!upRes.ok || !imageKey) {
+      const raw = upData.message || (upData.error && upData.error.message) || upData.error || upData.msg;
+      throw new Error((typeof raw === 'string' && raw) || JSON.stringify(upData) || 'HeyGen image upload failed');
+    }
+
+    const addRes = await fetch('https://api.heygen.com/v2/photo_avatar/avatar_group/add', {
+      method: 'POST',
+      headers: { 'x-api-key': Component.HEYGEN_KEY, 'content-type': 'application/json' },
+      body: JSON.stringify({ group_id: Component.HEYGEN_GROUP_ID, image_keys: [imageKey], name: 'Look ' + Date.now() })
+    });
+    const addData = await addRes.json();
+    const addD = addData.data;
+    const rawLook = Array.isArray(addD) ? addD[0] : (addD && addD.looks ? addD.looks[0] : (addD && addD.photo_avatar_list ? addD.photo_avatar_list[0] : addD));
+    const lookId = rawLook && rawLook.id;
+    if (!addRes.ok || !lookId) {
+      const raw = (addData.error && addData.error.message) || addData.error || addData.message;
+      throw new Error((typeof raw === 'string' && raw) || JSON.stringify(addData) || 'HeyGen add-look-to-avatar-group failed');
+    }
+
+    for (let i = 0; i < 40; i++) {
+      const lookRes = await fetch('https://api.heygen.com/v3/avatars/looks/' + lookId, {
+        headers: { 'x-api-key': Component.HEYGEN_KEY }
+      });
+      const lookData = await lookRes.json();
+      const look = lookData.data || lookData;
+      if (look.status === 'completed') {
+        if (!(look.supported_api_engines || []).includes('avatar_v')) {
+          throw new Error('This look isn\u2019t opted into Avatar V yet \u2014 enable it for the look in your HeyGen dashboard first.');
+        }
+        return lookId;
+      }
+      if (look.status === 'failed') throw new Error((look.error && look.error.message) || 'HeyGen look processing failed');
+      await new Promise(r => setTimeout(r, 3000));
+      this.setState(s => ({ progress: Math.min(50, s.progress + 2) }));
+    }
+    throw new Error('Timed out waiting for the new HeyGen look to finish processing');
+  }
+  static SUPABASE_URL = 'https://atxzerjckguzoczwfztx.supabase.co';
+  static SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0eHplcmpja2d1em9jendmenR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxOTI1OTgsImV4cCI6MjEwMjc2ODU5OH0.vuda4l4NtumdTE15dfgfYN6EYKBlJgA6QmeprhVgq_c';
+
+  getSupabase() {
+    if (!window.supabase) return null;
+    if (!this._sb) this._sb = window.supabase.createClient(Component.SUPABASE_URL, Component.SUPABASE_KEY);
+    return this._sb;
+  }
+
+  async uploadToSupabase(bucket, blob, ext) {
+    const sb = this.getSupabase();
+    if (!sb) return null;
+    const path = Date.now() + '-' + Math.random().toString(36).slice(2) + '.' + ext;
+    const { error } = await sb.storage.from(bucket).upload(path, blob, { contentType: blob.type || undefined });
+    if (error) { console.warn('[supabase upload failed]', bucket, error.message); return null; }
+    const { data } = sb.storage.from(bucket).getPublicUrl(path);
+    return data && data.publicUrl;
+  }
+
+  async ensurePublicUrl(url, bucket, ext) {
+    if (/^https?:\/\//i.test(url)) return url;
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const uploaded = await this.uploadToSupabase(bucket, blob, ext);
+    if (uploaded) return uploaded;
+    const b64 = await this.blobToBase64(blob);
+    return 'data:' + (blob.type || 'application/octet-stream') + ';base64,' + b64;
+  }
+  static MINIMAX_KEY = 'sk-api-Df2LM_zi_n4RWc9fHcgHIZztWufBwCti0EghwpnxjHW1gYDMUgjuuT57CaGnPhUzrjJlFo1Oee5S6k8bwRCHM29XVqtiF4-QzvsshU_GGh1Ym0E_SoE_kZU';
+
+  async previewVoice() {
+    this.stopPreview();
+    if (this.state.previewing) return;
+    this.setState({ previewing: true, ttsError: '' });
+    const fullScript = this.state.script.trim();
+    const picked = VOICES.find(v => this.state.voice === v.name);
+    const defaultByLang = { en: 'English_CalmWoman', zh: 'Chinese (Mandarin)_Sweet_Lady', yue: 'Cantonese_GentleLady' };
+    const voiceId = this.state.voiceId || (picked && picked.voiceId) || defaultByLang[this.state.lang] || 'English_CalmWoman';
+    try {
+      const res = await fetch('https://api.minimax.io/v1/t2a_v2', {
+        method: 'POST',
+        headers: { 'authorization': 'Bearer ' + Component.MINIMAX_KEY, 'content-type': 'application/json' },
+        body: JSON.stringify({
+          model: this.state.ttsModel, text: fullScript, stream: false,
+          language_boost: BOOST[this.state.lang] || 'auto',
+          voice_setting: { voice_id: voiceId, speed: 1, vol: 1, pitch: 0 },
+          audio_setting: { sample_rate: 32000, bitrate: 128000, format: 'mp3', channel: 1 }
+        })
+      });
+      const data = await res.json();
+      const hex = data && data.data && data.data.audio;
+      if (!res.ok || !hex) throw new Error((data.base_resp && data.base_resp.status_msg) || 'TTS request failed');
+      const bytes = new Uint8Array(hex.match(/.{1,2}/g).map(b => parseInt(b, 16)));
+      const url = URL.createObjectURL(new Blob([bytes], { type: 'audio/mpeg' }));
+      this.stopPreview();
+      this._sample = new Audio(url);
+      this._sample.play();
+      this.setState({ previewing: false });
+    } catch (err) {
+      this.setState({ previewing: false, ttsError: err.message || 'Could not reach MiniMax /v1/t2a_v2' });
+    }
+  }
+
+  set(patch) { this.setState(patch); }
+  go(screen) { this.setState({ screen }); }
+
+  grad(i) { return GRADS[i % GRADS.length]; }
+
+  pickFace(i) {
+    this.setState({ face: i, faceImg: null, outfit: null });
+    setTimeout(() => this.go('bg'), this.props.autoAdvance === false ? 100000 : 260);
+  }
+
+  pickOutfit(i) {
+    this.setState({ outfit: i, faceImg: null, mergedImg: this.assetUrl(OUTFITS[i].studio), outfitBg: 'studio', facePage: 'background', builtin: 'becky' });
+  }
+
+  pickAvery(thumb) {
+    this.setState({ outfit: null, faceImg: null, mergedImg: thumb ? this.assetUrl(thumb) : null, outfitBg: null, builtin: 'avery', screen: 'face', facePage: 'background', mergeError: '' });
+  }
+
+  backToClothing() {
+    this.setState({ facePage: 'clothing' });
+  }
+
+  keepOriginalBg() {
+    this.setState({ outfitBg: 'original', mergeError: '', facePage: 'preview' });
+  }
+
+  uploadWizardBg() {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = 'image/*';
+    input.onchange = e => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      this.setState({ merging: true, mergeError: '' });
+      this.uploadToSupabase('backgrounds', file, (file.name.split('.').pop() || 'png')).then(url => {
+        if (url) return this.composeWizardBg('the uploaded background photo', url);
+        const reader = new FileReader();
+        reader.onload = () => this.composeWizardBg('the uploaded background photo', reader.result);
+        reader.readAsDataURL(file);
+      });
+    };
+    input.click();
+  }
+
+  async composeWizardBg(bgName, bgImageUrl) {
+    const src = this.state.faceImg || this.state.mergedImg;
+    this.setState({ merging: true, mergeError: '' });
+    try {
+      if (!src) throw new Error('No avatar image yet — go back and pick or upload one first.');
+      if (!bgImageUrl) throw new Error('That background has no image yet. Open the Background library and upload a photo for it.');
+      const faceUrl = await this.ensurePublicUrl(src, 'avatars', 'png');
+      const bgUrl = await this.ensurePublicUrl(bgImageUrl, 'backgrounds', 'png');
+      const body = {
+        async: false, count: 1, model: 'nano-banana', action: 'edit',
+        prompt: 'Change background of image 1 to the background of image 2. \nKeep the full character of image 1 exactly the same (pose, body, clothes, face \u2014 no changes). \nMatch and merge the lighting + color tone of image 2 onto the character for a natural blend.',
+        image_urls: [faceUrl, bgUrl],
+        resolution: '1K', aspect_ratio: '1:1'
+      };
+      const res = await fetch('https://api.acedata.cloud/nano-banana/images', {
+        method: 'POST',
+        headers: { accept: 'application/json', authorization: 'Bearer ' + Component.API_KEY, 'content-type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (!res.ok || !data.data || !data.data[0]) throw new Error((data.error && data.error.message) || 'Merge request failed');
+      this.setState({ merging: false, mergedImg: data.data[0].image_url, outfitBg: bgName, facePage: 'preview' });
+    } catch (err) {
+      this.setState({ merging: false, mergeError: err.message || 'Could not reach /nano-banana/images' });
+    }
+  }
+
+  pickOutfitBg(key) {
+    this.setState(s => ({ outfitBg: key, mergedImg: this.assetUrl(OUTFITS[s.outfit][key]), facePage: 'preview' }));
+  }
+
+  pickBg(i) {
+    this.setState({ bg: i });
+    if (i === 0) { this.setState({ screen: 'script' }); return; }
+    const lib = this.state.bgLibrary[i - 1];
+    this.mergeImages(lib ? lib.name : BGS[i] ? BGS[i].name : 'this scene', lib ? lib.url : null);
+  }
+
+  addBgToLibrary() {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = 'image/*';
+    input.onchange = e => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      let name = 'New background';
+      try { const t = window.prompt('Name this background', 'New background'); if (t != null) name = t; } catch (err) {}
+      const id = 'bg' + Date.now();
+      this.setState({ addingBg: true });
+      const reader = new FileReader();
+      reader.onload = () => {
+        const localUrl = reader.result;
+        this.mutate(store => {
+          store.bgLibrary = (store.bgLibrary || []).concat([{ id, name: name.trim() || 'New background', url: localUrl }]);
+        });
+        this.uploadToSupabase('backgrounds', file, (file.name.split('.').pop() || 'png')).then(url => {
+          if (url) {
+            this.mutate(store => {
+              store.bgLibrary = (store.bgLibrary || []).map(b => b.id === id ? { ...b, url } : b);
+            });
+          }
+        }).catch(() => {}).then(() => this.setState({ addingBg: false }));
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  }
+
+  renameBg(id, current) {
+    this.setState({ renamingBg: id, renameBgDraft: current || '' });
+  }
+
+  saveRenameBg() {
+    const id = this.state.renamingBg;
+    const name = (this.state.renameBgDraft || '').trim();
+    if (!id || !name) { this.setState({ renamingBg: null }); return; }
+    this.mutate(store => { store.bgLibrary = (store.bgLibrary || []).map(b => b.id === id ? { ...b, name } : b); });
+    this.setState({ renamingBg: null, renameBgDraft: '' });
+  }
+
+  askDeleteBg(id, name) { this.setState({ confirmBg: { id, name } }); }
+  cancelDeleteBg() { this.setState({ confirmBg: null }); }
+  confirmDeleteBg() {
+    const target = this.state.confirmBg;
+    if (!target) return;
+    this.mutate(store => { store.bgLibrary = (store.bgLibrary || []).filter(x => x.id !== target.id); });
+    this.setState({ confirmBg: null });
+  }
+
+  // A new photo becomes a named avatar in the library, with that photo as its first look.
+  uploadFace() {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = 'image/*';
+    input.onchange = e => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const localUrl = URL.createObjectURL(file);
+      this.setState({ faceImg: localUrl, face: 6, pendingImg: localUrl, namePrompt: true, newAvatarName: '', pendingUploading: true, nameError: '' });
+      // The library must never store the temporary blob: URL — hold the upload so Save can await it.
+      this._faceUpload = this.uploadToSupabase('avatars', file, (file.name.split('.').pop() || 'png')).then(url => {
+        if (url) this.setState({ faceImg: url, pendingImg: url });
+        this.setState({ pendingUploading: false });
+        return url;
+      });
+    };
+    input.click();
+  }
+
+  // An explicit looks array wins, even when empty — only legacy records fall back to thumb.
+  looksOf(a) {
+    if (Array.isArray(a.looks)) return a.looks;
+    return a.thumb ? [{ id: a.id + '-l0', url: a.thumb, label: 'Original' }] : [];
+  }
+
+  async confirmNewAvatar() {
+    if (this.state.pendingUploading && this._faceUpload) {
+      this.setState({ nameError: '' });
+      await this._faceUpload;
+    }
+    const { pendingImg, newAvatarName } = this.state;
+    if (!pendingImg) return;
+    if (!/^https?:\/\//i.test(pendingImg)) {
+      this.setState({ nameError: 'The photo could not be uploaded to storage, so it would not survive a reload. Check the Supabase "avatars" bucket and try again.' });
+      return;
+    }
+    const id = 'a' + Date.now();
+    const entry = {
+      id, name: newAvatarName.trim() || 'My avatar', thumb: pendingImg,
+      voice: this.state.voice || 'Not set yet', face: 6, bg: 1,
+      looks: [{ id: id + '-l0', url: pendingImg, label: 'Original' }]
+    };
+    this.mutate(store => { store.saved = store.saved.concat([entry]); });
+    this.setState({ namePrompt: false, pendingImg: '', newAvatarName: '', nameError: '', mergedImg: pendingImg, faceImg: pendingImg, builtin: null, outfit: null, screen: 'face', facePage: 'background', outfitBg: null, mergeError: '' });
+  }
+
+  cancelNewAvatar() {
+    this.setState({ namePrompt: false, pendingImg: '', newAvatarName: '', nameError: '' });
+  }
+
+  addLook(avatarId) {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = 'image/*';
+    input.onchange = e => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      this.setState({ addingLook: true });
+      this.uploadToSupabase('avatars', file, (file.name.split('.').pop() || 'png')).then(url => {
+        if (!url) { this.setState({ addingLook: false }); return; }
+        this.mutate(store => {
+          store.saved = store.saved.map(a => a.id === avatarId
+            ? { ...a, looks: this.looksOf(a).concat([{ id: 'l' + Date.now(), url, label: 'Look ' + (this.looksOf(a).length + 1) }]) }
+            : a);
+        });
+        this.setState({ addingLook: false });
+      });
+    };
+    input.click();
+  }
+
+  removeLook(avatarId, lookId) {
+    this.mutate(store => {
+      store.saved = store.saved.map(a => {
+        if (a.id !== avatarId) return a;
+        const looks = this.looksOf(a).filter(l => l.id !== lookId);
+        // The card image has to follow the looks — otherwise it keeps showing a removed one.
+        return { ...a, looks, thumb: looks.length ? looks[0].url : '' };
+      });
+    });
+  }
+
+  // Adds an uploaded outfit photo to Becky/Avery's own outfit grid, saved so it persists.
+  addBuiltinLook(which) {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = 'image/*';
+    input.onchange = e => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      this.setState({ addingBuiltinLook: true });
+      this.uploadToSupabase('avatars', file, (file.name.split('.').pop() || 'png')).then(url => {
+        if (url) {
+          this.mutate(store => {
+            store.builtinLooks = store.builtinLooks || { becky: [], avery: [] };
+            store.builtinLooks[which] = (store.builtinLooks[which] || []).concat([{ id: 'bl' + Date.now(), url, name: 'Your upload' }]);
+          });
+        }
+        this.setState({ addingBuiltinLook: false });
+      });
+    };
+    input.click();
+  }
+
+  removeBuiltinLook(which, id) {
+    this.mutate(store => {
+      store.builtinLooks[which] = (store.builtinLooks[which] || []).filter(l => l.id !== id);
+    });
+  }
+
+  openLookMenu(e, ctx) {
+    e.preventDefault();
+    this.setState({ lookMenu: { x: e.clientX, y: e.clientY, ...ctx } });
+  }
+  closeLookMenu() { this.setState({ lookMenu: null }); }
+
+  renameLook() {
+    const m = this.state.lookMenu;
+    if (!m) return;
+    const next = window.prompt('Rename this look', m.name || '');
+    this.setState({ lookMenu: null });
+    if (next == null) return;
+    const name = next.trim();
+    if (!name) return;
+    if (m.kind === 'bgLib') {
+      this.mutate(store => { store.bgLibrary = (store.bgLibrary || []).map(b => b.id === m.lookId ? { ...b, name } : b); });
+    } else if (m.kind === 'builtin') {
+      this.mutate(store => {
+        store.builtinLooks[m.which] = (store.builtinLooks[m.which] || []).map(l => l.id === m.lookId ? { ...l, name } : l);
+      });
+    } else if (m.kind === 'static') {
+      this.mutate(store => { store.nameOverrides = { ...(store.nameOverrides || {}), [m.overrideKey]: name }; });
+    } else if (m.kind === 'avatarLook') {
+      this.mutate(store => {
+        store.saved = store.saved.map(a => a.id === m.avatarId
+          ? { ...a, looks: this.looksOf(a).map(l => l.id === m.lookId ? { ...l, label: name } : l) }
+          : a);
+      });
+    }
+  }
+
+  deleteLookFromMenu() {
+    const m = this.state.lookMenu;
+    if (!m) return;
+    this.setState({ lookMenu: null });
+    if (m.kind === 'bgLib') this.mutate(store => { store.bgLibrary = (store.bgLibrary || []).filter(b => b.id !== m.lookId); });
+    else if (m.kind === 'builtin') this.removeBuiltinLook(m.which, m.lookId);
+    else if (m.kind === 'avatarLook') this.removeLook(m.avatarId, m.lookId);
+    // static built-in outfits (OUTFITS/AVERY_LOOKS) can't be deleted — they're the base wardrobe.
+  }
+
+  useLook(url) {
+    this.setState({ mergedImg: url, faceImg: url, builtin: null, outfit: null, outfitBg: null, screen: 'face', facePage: 'background', mergeError: '' });
+  }
+
+  uploadBg() {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = 'image/*';
+    input.onchange = e => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const localUrl = URL.createObjectURL(file);
+      this.setState({ bgImg: localUrl, composePreview: false });
+      this.uploadToSupabase('backgrounds', file, (file.name.split('.').pop() || 'png')).then(url => {
+        this.mergeImages('the uploaded background photo', url || localUrl);
+      });
+    };
+    input.click();
+  }
+
+  uploadVoiceSample() {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = 'audio/*';
+    input.onchange = e => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      this.setState({ lipsyncAudio: null, lipsyncAudioName: '' });
+      this.finishRecording(file, file.name);
+    };
+    input.click();
+  }
+
+  async mergeImages(bgName, bgImageUrl) {
+    this.setState({ merging: true, mergeError: '' });
+    try {
+      if (!this.state.faceImg) throw new Error('Nano Banana needs a real photo — go back and upload one on the Face step (stock tiles are placeholders only).');
+      const faceUrl = await this.ensurePublicUrl(this.state.faceImg, 'avatars', 'png');
+      const bgUrl = bgImageUrl ? await this.ensurePublicUrl(bgImageUrl, 'backgrounds', 'png') : null;
+      const body = {
+        async: false, count: 1, model: 'nano-banana', action: 'edit',
+        prompt: 'Change background of image 1 to the background of image 2. \nKeep the full character of image 1 exactly the same (pose, body, clothes, face \u2014 no changes). \nMatch and merge the lighting + color tone of image 2 onto the character for a natural blend.',
+        image_urls: bgUrl ? [faceUrl, bgUrl] : [faceUrl],
+        resolution: '1K', aspect_ratio: '1:1'
+      };
+      const res = await fetch('https://api.acedata.cloud/nano-banana/images', {
+        method: 'POST',
+        headers: { accept: 'application/json', authorization: 'Bearer ' + Component.API_KEY, 'content-type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (!res.ok || !data.data || !data.data[0]) throw new Error((data.error && data.error.message) || 'Merge request failed');
+      this.setState({ merging: false, mergedImg: data.data[0].image_url, composePreview: true });
+    } catch (err) {
+      this.setState({ merging: false, mergeError: err.message || 'Could not reach /nano-banana/images' });
+    }
+  }
+
+  stopPreview() {
+    if (this._sample) { try { this._sample.onended = null; this._sample.pause(); this._sample.currentTime = 0; } catch (e) {} this._sample = null; }
+    if (this.state.playing) this.setState({ playing: '' });
+  }
+
+  pickVoice(v) {
+    this.setState({ voice: v.name, voiceId: v.voiceId, recording: false, recSec: 0, training: false, lipsyncAudio: null, lipsyncAudioName: '' });
+  }
+
+  async sampleVoice(v) {
+    this.setState({ sampling: v.voiceId, ttsError: '' });
+    try {
+      const res = await fetch('https://api.minimax.io/v1/t2a_v2', {
+        method: 'POST',
+        headers: { authorization: 'Bearer ' + Component.MINIMAX_KEY, 'content-type': 'application/json' },
+        body: JSON.stringify({
+          model: this.state.ttsModel, text: SAMPLE_TEXT[v.lang] || SAMPLE_TEXT.en, stream: false,
+          language_boost: BOOST[v.lang] || 'auto',
+          voice_setting: { voice_id: v.voiceId, speed: 1, vol: 1, pitch: 0 },
+          audio_setting: { sample_rate: 32000, bitrate: 128000, format: 'mp3', channel: 1 }
+        })
+      });
+      const data = await res.json();
+      const hex = data && data.data && data.data.audio;
+      if (!res.ok || !hex) throw new Error((data.base_resp && data.base_resp.status_msg) || ('MiniMax rejected voice id "' + v.voiceId + '"'));
+      const bytes = new Uint8Array(hex.match(/.{1,2}/g).map(b => parseInt(b, 16)));
+      this.stopPreview();
+      this._sample = new Audio(URL.createObjectURL(new Blob([bytes], { type: 'audio/mpeg' })));
+      this._sample.onended = () => this.setState({ playing: '' });
+      this._sample.play();
+      this.setState({ sampling: '', playing: v.voiceId });
+    } catch (err) {
+      this.setState({ sampling: '', playing: '', ttsError: err.message || 'Could not reach MiniMax /v1/t2a_v2' });
+    }
+  }
+
+  uploadLipsync() {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = 'audio/*';
+    input.onchange = e => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      this.setState({ lipsyncAudio: URL.createObjectURL(file), lipsyncAudioName: file.name });
+    };
+    input.click();
+  }
+
+  async startRecord() {
+    if (this.state.recording) return;
+    this.setState({ recording: true, recSec: 0, lipsyncAudio: null, lipsyncAudioName: '', cloneError: '' });
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (err) {
+      this.setState({ recording: false, cloneError: 'Could not access the microphone: ' + (err.message || err) });
+      return;
+    }
+    const mime = ['audio/webm', 'audio/mp4', 'audio/ogg'].find(t => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || '';
+    this._chunks = [];
+    this._recorder = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+    this._recorder.ondataavailable = e => { if (e.data && e.data.size) this._chunks.push(e.data); };
+    this._recorder.onstop = () => {
+      stream.getTracks().forEach(t => t.stop());
+      const blob = new Blob(this._chunks, { type: this._recorder.mimeType || 'audio/webm' });
+      this.finishRecording(blob, 'recording.webm');
+    };
+    this._recorder.start();
+    clearInterval(this._r);
+    this._r = setInterval(() => {
+      this.setState(s => {
+        if (s.recSec >= 30) {
+          clearInterval(this._r);
+          if (this._recorder && this._recorder.state !== 'inactive') this._recorder.stop();
+          return { recSec: 30, recording: false };
+        }
+        return { recSec: s.recSec + 1 };
+      });
+    }, 1000);
+  }
+
+  stopRecord() {
+    if (!this.state.recording) return;
+    clearInterval(this._r);
+    this.setState({ recording: false });
+    if (this._recorder && this._recorder.state !== 'inactive') this._recorder.stop();
+  }
+
+  async transcodeToWav(blob) {
+    const arrayBuf = await blob.arrayBuffer();
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const audioBuf = await ctx.decodeAudioData(arrayBuf.slice(0));
+    const numCh = audioBuf.numberOfChannels;
+    const len = audioBuf.length;
+    const sr = audioBuf.sampleRate;
+    const interleaved = new Float32Array(len * numCh);
+    for (let ch = 0; ch < numCh; ch++) {
+      const data = audioBuf.getChannelData(ch);
+      for (let i = 0; i < len; i++) interleaved[i * numCh + ch] = data[i];
+    }
+    const bytesPerSample = 2;
+    const blockAlign = numCh * bytesPerSample;
+    const dataSize = interleaved.length * bytesPerSample;
+    const buffer = new ArrayBuffer(44 + dataSize);
+    const view = new DataView(buffer);
+    const writeStr = (o, s) => { for (let i = 0; i < s.length; i++) view.setUint8(o + i, s.charCodeAt(i)); };
+    writeStr(0, 'RIFF'); view.setUint32(4, 36 + dataSize, true); writeStr(8, 'WAVE');
+    writeStr(12, 'fmt '); view.setUint32(16, 16, true); view.setUint16(20, 1, true);
+    view.setUint16(22, numCh, true); view.setUint32(24, sr, true);
+    view.setUint32(28, sr * blockAlign, true); view.setUint16(32, blockAlign, true); view.setUint16(34, 16, true);
+    writeStr(36, 'data'); view.setUint32(40, dataSize, true);
+    let off = 44;
+    for (let i = 0; i < interleaved.length; i++, off += 2) {
+      const s = Math.max(-1, Math.min(1, interleaved[i]));
+      view.setInt16(off, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+    }
+    ctx.close();
+    return new Blob([buffer], { type: 'audio/wav' });
+  }
+
+  async finishRecording(blob, filename) {
+    this.setState({ training: true, cloneError: '' });
+    try {
+      const extFromName = filename && filename.includes('.') ? filename.split('.').pop().toLowerCase() : '';
+      const mimeExt = { mp3: 'mp3', mpeg: 'mp3', wav: 'wav', 'x-wav': 'wav', mp4: 'm4a', 'x-m4a': 'm4a', m4a: 'm4a', webm: 'wav', ogg: 'wav' };
+      const rawType = (blob.type.split('/')[1] || '').split(';')[0].trim().toLowerCase();
+      let ext = extFromName && ['mp3', 'wav', 'm4a'].includes(extFromName) ? extFromName : (mimeExt[rawType] || 'mp3');
+      let uploadBlob = blob;
+      if (!['mp3', 'wav', 'm4a'].includes(ext) || (rawType === 'webm' || rawType === 'ogg')) {
+        uploadBlob = await this.transcodeToWav(blob);
+        ext = 'wav';
+      }
+      const form = new FormData();
+      form.append('purpose', 'voice_clone');
+      form.append('file', uploadBlob, 'clone-sample.' + ext);
+      const upRes = await fetch('https://api.minimax.io/v1/files/upload', {
+        method: 'POST',
+        headers: { authorization: 'Bearer ' + Component.MINIMAX_KEY },
+        body: form
+      });
+      const upData = await upRes.json();
+      const fileId = upData.file && upData.file.file_id;
+      if (!upRes.ok || !fileId) throw new Error((upData.base_resp && upData.base_resp.status_msg) || 'MiniMax file upload failed');
+
+      const voiceId = 'clone_' + Date.now();
+      const cloneRes = await fetch('https://api.minimax.io/v1/voice_clone', {
+        method: 'POST',
+        headers: { authorization: 'Bearer ' + Component.MINIMAX_KEY, 'content-type': 'application/json' },
+        body: JSON.stringify({ file_id: fileId, voice_id: voiceId, text: 'Hello, this is a preview of my cloned voice.', model: this.state.ttsModel })
+      });
+      const cloneData = await cloneRes.json();
+      if (!cloneRes.ok || (cloneData.base_resp && cloneData.base_resp.status_code !== 0)) {
+        throw new Error((cloneData.base_resp && cloneData.base_resp.status_msg) || 'MiniMax voice_clone failed');
+      }
+      this.setState({ training: false, voice: "Becky's voice", voiceId, screen: 'script' });
+      this.loadClonedVoices();
+      // Activate the voice so MiniMax retains it beyond the 7-day trial window (the clone-time preview alone does not persist it).
+      fetch('https://api.minimax.io/v1/t2a_v2', {
+        method: 'POST',
+        headers: { authorization: 'Bearer ' + Component.MINIMAX_KEY, 'content-type': 'application/json' },
+        body: JSON.stringify({
+          model: this.state.ttsModel, text: 'This voice is now saved and ready to use.', stream: false,
+          voice_setting: { voice_id: voiceId, speed: 1, vol: 1, pitch: 0 },
+          audio_setting: { sample_rate: 32000, bitrate: 128000, format: 'mp3', channel: 1 }
+        })
+      }).catch(() => {});
+    } catch (err) {
+      this.setState({ training: false, cloneError: err.message || 'Voice cloning failed' });
+    }
+  }
+
+  rewrite(kind) {
+    const s = this.state.script.trim();
+    if (kind === 'short') {
+      const parts = s.split('. ').filter(Boolean);
+      this.setState({ script: parts.slice(0, Math.max(1, parts.length - 2)).join('. ').replace(/\.?$/, '.') });
+    } else if (kind === 'warm') {
+      this.setState({ script: 'Hi everyone — thanks for making the time. ' + s });
+    } else {
+      this.setState({ script: SCRIPTS[this.state.lang] || SEED, customScript: false });
+    }
+  }
+
+  async checkCredits() {
+    // HeyGen has no public balance endpoint; surface remaining credits via the dashboard instead.
+    this.setState({ creditState: 'done', falBalance: null });
+  }
+
+  async checkCreditsProxy() { return this.checkCredits(); }
+
+  generate() {
+    this.generateHeyGen();
+  }
+
+  async blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result).split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  hexToBase64(hex) {
+    const bytes = hex.match(/.{1,2}/g).map(b => parseInt(b, 16));
+    let bin = '';
+    for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin);
+  }
+
+  async getAudioDataUri() {
+    if (this.state.lipsyncAudio) {
+      return await this.ensurePublicUrl(this.state.lipsyncAudio, 'renders', 'mp3');
+    }
+    const defaultByLang = { en: 'English_CalmWoman', zh: 'Chinese (Mandarin)_Sweet_Lady', yue: 'Cantonese_GentleLady' };
+    const voiceId = this.state.voiceId || defaultByLang[this.state.lang] || 'English_CalmWoman';
+    const res = await fetch('https://api.minimax.io/v1/t2a_v2', {
+      method: 'POST',
+      headers: { authorization: 'Bearer ' + Component.MINIMAX_KEY, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        model: this.state.ttsModel, text: this.state.script, stream: false,
+        language_boost: BOOST[this.state.lang] || 'auto',
+        voice_setting: { voice_id: voiceId, speed: 1, vol: 1, pitch: 0 },
+        audio_setting: { sample_rate: 32000, bitrate: 128000, format: 'mp3', channel: 1 }
+      })
+    });
+    const data = await res.json();
+    const hex = data && data.data && data.data.audio;
+    if (!res.ok || !hex) throw new Error((data.base_resp && data.base_resp.status_msg) || 'MiniMax TTS failed to produce audio for the talking-photo call');
+    const bytes = new Uint8Array(hex.match(/.{1,2}/g).map(b => parseInt(b, 16)));
+    const blob = new Blob([bytes], { type: 'audio/mpeg' });
+    const uploaded = await this.uploadToSupabase('renders', blob, 'mp3');
+    return uploaded || ('data:audio/mpeg;base64,' + this.hexToBase64(hex));
+  }
+
+  async pollHeyGenVideo(videoId) {
+    for (let i = 0; i < 60; i++) {
+      await new Promise(r => setTimeout(r, 6000));
+      const res = await fetch('https://api.heygen.com/v3/videos/' + videoId, {
+        headers: { 'x-api-key': Component.HEYGEN_KEY }
+      });
+      const data = await res.json();
+      const d = data.data || data;
+      if (d.status === 'completed' && (d.video_url || d.url)) return d.video_url || d.url;
+      if (d.status === 'failed') throw new Error(d.failure_message || d.error || 'HeyGen video generation failed');
+      this.setState(s => ({ progress: Math.min(90, s.progress + 3) }));
+    }
+    throw new Error('HeyGen video generation timed out');
+  }
+
+  async generateHeyGen() {
+    const imageUrl = this.state.mergedImg || this.state.faceImg;
+    if (!imageUrl) {
+      this.setState({ genError: 'Upload a face photo first \u2014 HeyGen Avatar V animates a still portrait, it needs a photo to work from.' });
+      return;
+    }
+    const jobId = 'p' + Date.now();
+    const st0 = this.state;
+    const baseName = st0.builtin === 'avery' ? 'Avery' : (st0.outfit != null ? 'Becky' : (FACES[st0.face] ? FACES[st0.face].name : 'My avatar'));
+    const ratioLabel = (RATIOS.find(r => r.id === (st0.ratio || '16:9')) || {}).label;
+    (this._activeJobs || (this._activeJobs = new Set())).add(jobId);
+    this.mutate(st => {
+      st.projects = [{
+        id: jobId, title: baseName + ' video', meta: 'Rendering…', status: 'rendering',
+        thumb: imageUrl, bgSeed: st0.bg || 0, videoUrl: '', folder: '',
+        ratio: st0.ratio || '16:9', ratioLabel, resolution: st0.resolution
+      }].concat(st.projects);
+    });
+    this.setState({ screen: 'rendering', stage: 0, progress: 15, genError: '', activeProject: jobId, openTitle: baseName + ' video' });
+    try {
+      const audioUrl = await this.getAudioDataUri();
+      this.setState({ stage: 1, progress: 40 });
+      const finalImageUrl = await this.ensurePublicUrl(imageUrl, 'renders', 'png');
+      if (finalImageUrl.startsWith('data:') || audioUrl.startsWith('data:')) {
+        throw new Error('Supabase Storage upload failed, so the photo/audio couldn\u2019t get a public URL (fell back to a huge inline data URL that HeyGen rejects). In your Supabase dashboard, open Storage \u2192 the "renders"/"avatars"/"backgrounds" buckets \u2192 Policies, and add an INSERT policy allowing the anon role to upload \u2014 a public bucket only makes reads public by default.');
+      }
+      const lookId = await this.getOrCreateAvatarVLook(finalImageUrl);
+      this.setState({ stage: 2, progress: 55 });
+      const videoRes = await fetch('https://api.heygen.com/v3/videos', {
+        method: 'POST',
+        headers: { 'x-api-key': Component.HEYGEN_KEY, 'content-type': 'application/json' },
+        body: JSON.stringify({
+          type: 'avatar', avatar_id: lookId,
+          audio_url: audioUrl,
+          resolution: this.state.resolution || '1080p', aspect_ratio: 'auto',
+          engine: { type: 'avatar_v' }
+        })
+      });
+      const videoData = await videoRes.json();
+      const videoId = videoData.data && videoData.data.video_id;
+      if (!videoRes.ok || !videoId) {
+        const raw = videoData.message || videoData.error;
+        throw new Error((typeof raw === 'string' && raw) || JSON.stringify(videoData) || 'HeyGen video creation failed');
+      }
+      const videoUrl = await this.pollHeyGenVideo(videoId);
+      this.setState({ stage: 3, progress: 100 });
+      this._activeJobs.delete(jobId);
+      this.updateProject(jobId, {
+        status: 'done', videoUrl,
+        meta: ratioLabel + ' \u00b7 ' + (this.state.resolution || '1080p') + ' \u00b7 just now'
+      });
+      setTimeout(() => this.setState(s => ({
+        screen: s.screen === 'rendering' ? 'result' : s.screen,
+        savePrompt: s.screen === 'rendering',
+        resultVideoUrl: s.screen === 'rendering' ? videoUrl : s.resultVideoUrl,
+        avatarName: baseName + ' \u2014 ' + (s.lang === 'en' ? 'English' : 'Chinese'),
+      })), 400);
+      this.refreshHeygenQuota();
+    } catch (err) {
+      this._activeJobs.delete(jobId);
+      this.updateProject(jobId, { status: 'failed', meta: 'Failed \u00b7 ' + (err.message || 'render error').slice(0, 60) });
+      this.setState(s => ({
+        screen: s.screen === 'rendering' ? 'confirm' : s.screen,
+        genError: err.message || 'Could not reach HeyGen'
+      }));
+    }
+  }
+
+  durSec() {
+    const w = this.words();
+    if (!w) return 15;
+    return Math.max(15, Math.ceil(w / 2.5 / 15) * 15);
+  }
+  words() { return this.state.script.trim() ? this.state.script.trim().split(/\s+/).length : 0; }
+
+  fmtDur(sec) {
+    if (sec < 60) return sec + ' seconds';
+    const m = Math.floor(sec / 60), r = sec % 60;
+    return r ? m + 'm ' + r + 's' : m + ' minutes';
+  }
+
+  renderVals() {
+    const st = this.state;
+    const price = this.props.pricePerMinute ?? 1.2;
+    const auto = this.props.autoAdvance ?? true;
+    const sec = this.durSec();
+    const cost = (sec / 60) * price;
+    const faceIdx = st.face == null ? 0 : st.face;
+    const bgIdx = st.bg == null ? 1 : st.bg;
+    const ratioId = st.ratio || this.props.defaultRatio || '16:9';
+    const ratioObj = RATIOS.find(r => r.id === ratioId) || RATIOS[0];
+    const mono = FACES[faceIdx] ? FACES[faceIdx].mono : 'A';
+
+    const stepOrder = ['face', 'script', 'format', 'confirm'];
+    const cur = stepOrder.indexOf(st.screen);
+
+    const navItems = [
+      { key: 'dashboard', label: 'Home', badge: '' },
+      { key: 'library', label: 'Avatars', badge: String(st.saved.length) },
+      { key: 'bg', label: 'Background', badge: String(st.bgLibrary.length) },
+      { key: 'projects', label: 'Projects', badge: String(st.projects.length) }
+    ].map(n => ({
+      label: n.label, badge: n.badge,
+      bg: st.screen === n.key ? '#F4F8F9' : 'transparent',
+      color: st.screen === n.key ? '#0f172a' : '#64748b',
+      weight: st.screen === n.key ? 600 : 500,
+      go: () => this.go(n.key)
+    }));
+    const openAvatar = st.libraryAvatar ? st.saved.find(a => a.id === st.libraryAvatar) : null;
+    const folderName = id => (st.folders.find(f => f.id === id) || {}).name || '';
+    const projectCard = p => ({
+      title: p.title, meta: p.meta,
+      bg: p.thumb ? 'url("' + p.thumb + '") center/cover' : this.grad(p.bgSeed || 0),
+      isRendering: p.status === 'rendering',
+      isDone: p.status === 'done',
+      isFailed: p.status === 'failed',
+      folder: p.folder || '',
+      folderLabel: p.folder ? folderName(p.folder) : 'No folder',
+      open: () => this.openProject(p),
+      checked: st.selected.includes(p.id),
+      tickBg: st.selected.includes(p.id) ? '#0f172a' : 'rgba(255,255,255,.92)',
+      tickColor: st.selected.includes(p.id) ? '#ffffff' : 'transparent',
+      tickBorder: st.selected.includes(p.id) ? '#0f172a' : '#cbd5e1',
+      cardRing: st.selected.includes(p.id) ? '#0f172a' : '#eef2f5',
+      toggle: () => this.toggleSelect(p.id)
+    });
+
+    return {
+      nav: navItems,
+      minutesLeft: st.heygenCredits == null ? (st.quotaError || 'Loading…') : st.heygenCredits + ' credits',
+      minutesPct: st.heygenCredits == null ? 0 : Math.max(2, Math.min(100, Math.round((st.heygenCredits / 100) * 100))),
+
+      isDashboard: st.screen === 'dashboard',
+      isFace: st.screen === 'face', isBg: st.screen === 'bg',
+      isScript: st.screen === 'script',
+      isFormat: st.screen === 'format', isConfirm: st.screen === 'confirm',
+      isRendering: st.screen === 'rendering', isResult: st.screen === 'result',
+      isLibrary: st.screen === 'library',
+      isProjects: st.screen === 'projects',
+      showStepper: cur >= 0,
+
+      resolutions: ['480p', '720p', '1080p'].map(r => ({
+        label: r,
+        bg: st.resolution === r ? '#0f172a' : '#ffffff',
+        color: st.resolution === r ? '#ffffff' : '#475569',
+        border: st.resolution === r ? '#0f172a' : '#e2e8f0',
+        pick: () => this.setState({ resolution: r })
+      })),
+      resolutionLabel: st.resolution,
+
+      folderOptions: [{ id: '', name: 'No folder' }].concat(st.folders),
+      selectionCount: st.selected.length + (st.selected.length === 1 ? ' project selected' : ' projects selected'),
+      hasSelection: st.selected.length > 0,
+      clearSelection: () => this.setState({ selected: [], movePicker: false }),
+      openMove: () => this.setState(s => ({ movePicker: !s.movePicker })),
+      movePickerOpen: st.movePicker,
+      moveTargets: [{ id: '', name: 'No folder' }].concat(st.folders).map(f => ({
+        name: f.name, pick: () => this.moveSelected(f.id)
+      })),
+      deleteSelected: () => this.deleteSelected(),
+      folderChips: [{ id: 'all', name: 'All projects' }].concat(st.folders).map(f => ({
+        label: f.name,
+        editing: st.editingFolder === f.id,
+        notEditing: st.editingFolder !== f.id,
+        canEdit: f.id !== 'all',
+        showActions: f.id !== 'all' && st.folderFilter === f.id,
+        isAll: f.id === 'all',
+        bg: st.folderFilter === f.id ? '#0f172a' : '#ffffff',
+        color: st.folderFilter === f.id ? '#ffffff' : '#475569',
+        border: st.folderFilter === f.id ? '#0f172a' : '#e2e8f0',
+        select: () => this.setState({ folderFilter: f.id }),
+        startRename: () => this.setState({ editingFolder: f.id, folderDraft: f.name }),
+        remove: () => this.removeFolder(f.id)
+      })),
+      folderDraft: st.folderDraft,
+      onFolderDraft: e => this.setState({ folderDraft: e.target.value }),
+      commitFolder: () => this.commitFolderName(),
+      newFolder: () => this.addFolder(),
+      visibleProjects: st.projects.filter(p => st.folderFilter === 'all' || p.folder === st.folderFilter).map(projectCard),
+      hasVisibleProjects: st.projects.filter(p => st.folderFilter === 'all' || p.folder === st.folderFilter).length > 0,
+      noVisibleProjects: st.projects.filter(p => st.folderFilter === 'all' || p.folder === st.folderFilter).length === 0,
+
+      steps: ['Avatar', 'Voice & script', 'Format', 'Generate'].map((label, i) => {
+        const done = i < cur, now = i === cur;
+        return {
+          label, num: done ? '✓' : String(i + 1),
+          dotBg: now ? '#0f172a' : done ? '#F4F8F9' : '#ffffff',
+          dotColor: now ? '#ffffff' : done ? '#B567C2' : '#94a3b8',
+          dotBorder: now ? '#0f172a' : done ? '#e2e8f0' : '#e2e8f0',
+          labelColor: now ? '#0f172a' : done ? '#475569' : '#94a3b8',
+          weight: now ? 600 : 500,
+          go: () => { if (i <= cur) this.go(stepOrder[i]); }
+        };
+      }),
+
+      goDashboard: () => this.go('dashboard'),
+      newVideo: () => this.setState({
+        screen: 'face', face: null, bg: null, voice: null, ratio: null,
+        version: 'orig', savePrompt: false, stage: -1, progress: 0,
+        genError: '', resultVideoUrl: '', facePage: 'select', outfit: null, mergedImg: null, builtin: null, openTitle: ''
+      }),
+      goLibrary: () => this.setState({ screen: 'library', libraryAvatar: null }),
+      goFace: () => this.go('face'),
+      goFormat: () => this.go('format'),
+
+      onSelectPage: st.facePage === 'select',
+      onClothingPage: st.facePage === 'clothing',
+      onBackgroundPage: st.facePage === 'background',
+      isBeckyChoice: st.builtinChoice === 'becky',
+      isAveryChoice: st.builtinChoice === 'avery',
+      selectBecky: () => this.setState({ builtinChoice: 'becky', facePage: 'clothing' }),
+      selectAvery: () => this.setState({ builtinChoice: 'avery', facePage: 'clothing' }),
+      backToSelect: () => this.setState({ facePage: 'select' }),
+      pickAvery: () => this.pickAvery(),
+      averyRing: st.builtin === 'avery' ? '2px solid #B567C2' : '0px solid transparent',
+      beckyIconThumb: this.assetUrl('./assets/becky-charcoal-blazer-office.png'),
+      averyIconThumb: this.assetUrl('./assets/avery-tech-blazer-studio.png'),
+      averyLooks: AVERY_LOOKS.map((l, i) => ({
+        name: st.nameOverrides['avery-' + i] || l.name, thumb: this.assetUrl(l.thumb),
+        ring: st.builtin === 'avery' && st.mergedImg === this.assetUrl(l.thumb) ? '2px solid #B567C2' : '0px solid transparent',
+        pick: () => this.pickAvery(l.thumb),
+        menu: e => this.openLookMenu(e, { kind: 'static', overrideKey: 'avery-' + i, name: st.nameOverrides['avery-' + i] || l.name })
+      })).concat((st.builtinLooks.avery || []).map(l => ({
+        name: l.name, thumb: l.url,
+        ring: st.mergedImg === l.url ? '2px solid #B567C2' : '0px solid transparent',
+        pick: () => this.pickAvery(l.url),
+        menu: e => this.openLookMenu(e, { kind: 'builtin', which: 'avery', lookId: l.id, name: l.name })
+      }))),
+      selectedOutfitName: st.outfit != null ? OUTFITS[st.outfit].name : '',
+      backToClothing: () => this.backToClothing(),
+      outfits: OUTFITS.map((o, i) => ({
+        name: st.nameOverrides['outfit-' + i] || o.name, thumb: this.assetUrl(o.studio),
+        ring: st.outfit === i ? '2px solid #B567C2' : '0px solid transparent',
+        pick: () => this.pickOutfit(i),
+        menu: e => this.openLookMenu(e, { kind: 'static', overrideKey: 'outfit-' + i, name: st.nameOverrides['outfit-' + i] || o.name })
+      })).concat((st.builtinLooks.becky || []).map(l => ({
+        name: l.name, thumb: l.url,
+        ring: st.outfit == null && st.mergedImg === l.url ? '2px solid #B567C2' : '0px solid transparent',
+        pick: () => this.setState({ outfit: null, mergedImg: l.url, faceImg: l.url, facePage: 'background', mergeError: '' }),
+        menu: e => this.openLookMenu(e, { kind: 'builtin', which: 'becky', lookId: l.id, name: l.name })
+      }))),
+      addBeckyLook: () => this.addBuiltinLook('becky'),
+      addAveryLook: () => this.addBuiltinLook('avery'),
+      addingBuiltinLook: st.addingBuiltinLook,
+      notAddingBuiltinLook: !st.addingBuiltinLook,
+
+      lookMenu: st.lookMenu,
+      lookMenuStyle: st.lookMenu ? ('position:fixed;top:' + st.lookMenu.y + 'px;left:' + st.lookMenu.x + 'px;z-index:60;') : 'display:none;',
+      renameLook: () => this.renameLook(),
+      deleteLookFromMenu: () => this.deleteLookFromMenu(),
+      closeLookMenu: () => this.closeLookMenu(),
+      lookMenuCanDelete: !!st.lookMenu && st.lookMenu.kind !== 'static',
+      onPreviewPage: st.facePage === 'preview',
+      previewImg: st.mergedImg,
+      confirmPreview: () => this.go('script'),
+      changeBackground: () => this.setState({ screen: 'face', facePage: 'background', mergeError: '' }),
+      hasOutfit: st.outfit != null,
+      noOutfit: st.outfit == null,
+      outfitBgs: st.outfit != null ? [
+        { key: 'studio', name: 'White studio', thumb: this.assetUrl(OUTFITS[st.outfit].studio) },
+        { key: 'office', name: 'Modern office', thumb: this.assetUrl(OUTFITS[st.outfit].office) },
+        { key: 'home', name: 'Warm home', thumb: this.assetUrl(OUTFITS[st.outfit].home) }
+      ].map(b => ({ name: b.name, thumb: b.thumb, ring: st.outfitBg === b.key ? '2px solid #B567C2' : '0px solid transparent', pick: () => this.pickOutfitBg(b.key) })) : [],
+      hasComposed: !!(st.mergedImg || st.faceImg),
+      composedThumb: (st.mergedImg || st.faceImg) ? 'url("' + (st.mergedImg || st.faceImg) + '") center top/cover' : 'none',
+      merging: st.merging,
+      mergeError: st.mergeError,
+      keepOriginalThumb: (st.mergedImg || st.faceImg) ? 'url("' + (st.mergedImg || st.faceImg) + '") center top/cover' : 'none',
+      keepOriginalBg: () => this.keepOriginalBg(),
+      uploadWizardBg: () => this.uploadWizardBg(),
+      wizardBgs: st.bgLibrary.map((b, i) => ({
+        name: b.name,
+        bg: b.url ? ('url("' + b.url + '") center/cover') : this.grad(i + 2),
+        ring: st.outfitBg === b.name ? '2px solid #B567C2' : '0px solid transparent',
+        pick: () => this.composeWizardBg(b.name, b.url)
+      })),
+      faces: FACES.map((f, i) => ({
+        name: f.name, mono: f.mono, bg: this.grad(i),
+        shadow: '0 10px 30px -10px rgba(0,0,0,0.1)',
+        ring: st.face === i ? '2px solid #B567C2' : '0px solid transparent',
+        pick: () => this.pickFace(i)
+      })),
+      hasFaceImg: !!st.faceImg,
+      noFaceImg: !st.faceImg,
+      uploadedFaceBg: st.faceImg ? 'url("' + st.faceImg + '") center top/cover' : '#ffffff',
+      uploadFace: () => this.uploadFace(),
+
+      backgrounds: st.bgLibrary.map((b, i) => ({
+        name: b.name, bg: b.url ? ('url("' + b.url + '") center/cover') : this.grad(i + 2),
+        rename: () => this.renameBg(b.id, b.name),
+        renameCtx: e => { e.preventDefault(); this.renameBg(b.id, b.name); },
+        remove: () => this.askDeleteBg(b.id, b.name)
+      })),
+      renamingBg: !!st.renamingBg,
+      renameBgDraft: st.renameBgDraft || '',
+      onRenameBgDraft: e => this.setState({ renameBgDraft: e.target.value }),
+      saveRenameBg: () => this.saveRenameBg(),
+      cancelRenameBg: () => this.setState({ renamingBg: null, renameBgDraft: '' }),
+      confirmBg: st.confirmBg,
+      confirmBgName: st.confirmBg ? st.confirmBg.name : '',
+      cancelDeleteBg: () => this.cancelDeleteBg(),
+      confirmDeleteBg: () => this.confirmDeleteBg(),
+      addBg: () => this.addBgToLibrary(),
+      addingBg: st.addingBg,
+      notAddingBg: !st.addingBg,
+
+      voiceCount: VOICES.filter(v => st.voiceFilter === 'all' || v.lang === st.voiceFilter).length,
+      voiceFilters: [{ id: 'all', label: 'All' }].concat(LANGS).map(f => ({
+        label: f.label, pick: () => this.setState({ voiceFilter: f.id }),
+        bg: (st.voiceFilter || 'all') === f.id ? '#0f172a' : '#ffffff',
+        color: (st.voiceFilter || 'all') === f.id ? '#ffffff' : '#475569',
+        border: (st.voiceFilter || 'all') === f.id ? '#0f172a' : '#e2e8f0'
+      })),
+      voices: VOICES.filter(v => (st.voiceFilter || 'all') === 'all' || v.lang === st.voiceFilter).map((v, i) => ({
+        name: v.name, desc: v.desc, bg: this.grad(i + 1),
+        icon: st.sampling === v.voiceId ? '⋯' : st.playing === v.voiceId ? '❙❙' : '▶',
+        rowBg: st.voice === v.name ? '#F4F8F9' : '#ffffff',
+        border: st.voice === v.name ? '#B567C2' : 'transparent',
+        isPlaying: st.playing === v.voiceId,
+        notPlaying: st.playing !== v.voiceId,
+        pick: () => this.pickVoice(v),
+        play: () => this.sampleVoice(v),
+        stop: () => this.stopPreview()
+      })),
+      startRecord: () => this.startRecord(),
+      stopRecord: () => this.stopRecord(),
+      cloneError: st.cloneError,
+      uploadVoice: () => this.uploadVoiceSample(),
+      uploadLipsync: () => this.uploadLipsync(),
+      cloneBorder: st.voiceId && st.clonedVoices.some(v => v.voiceId === st.voiceId) ? '#0f172a' : '#e2e8f0',
+      hasClonedVoice: st.clonedVoices.length > 0,
+      clonedVoiceRows: st.clonedVoices.map(v => {
+        const shown = st.voiceNames[v.voiceId] || v.name;
+        return {
+          name: shown,
+          editing: st.editingVoice === v.voiceId,
+          notEditing: st.editingVoice !== v.voiceId,
+          rowBg: st.voiceId === v.voiceId ? '#F4F8F9' : '#ffffff',
+          checkColor: st.voiceId === v.voiceId ? '#0f172a' : '#94a3b8',
+          checkLabel: st.voiceId === v.voiceId ? 'Selected' : 'Use',
+          pick: () => this.setState({ voiceId: v.voiceId, voice: shown }),
+          play: () => this.sampleVoice({ voiceId: v.voiceId, lang: st.lang }),
+          startRename: () => this.setState({ editingVoice: v.voiceId, voiceDraft: shown }),
+          remove: () => this.deleteClonedVoice(v.voiceId)
+        };
+      }),
+      voiceDraft: st.voiceDraft,
+      onVoiceDraft: e => this.setState({ voiceDraft: e.target.value }),
+      commitVoiceName: () => this.commitVoiceName(),
+      stopVoice: () => this.stopPreview(),
+      lipsyncBorder: st.lipsyncAudio ? '#0f172a' : '#e2e8f0',
+      models: MODELS.map(m => ({
+        label: m.replace('speech-', ''),
+        bg: st.ttsModel === m ? '#0f172a' : '#ffffff',
+        color: st.ttsModel === m ? '#ffffff' : '#475569',
+        border: st.ttsModel === m ? '#0f172a' : '#e2e8f0',
+        pick: () => this.setState({ ttsModel: m })
+      })),
+      recording: st.recording, recSec: st.recSec,
+      recPct: Math.round((st.recSec / 30) * 100),
+      training: st.training,
+      bars: Array.from({ length: 42 }, (_, i) => ({ h: 25 + ((i * 37) % 70), dur: (0.5 + ((i % 5) * 0.14)).toFixed(2) })),
+
+      voiceSummary: st.lipsyncAudio ? ('using ' + st.lipsyncAudioName + ' (voice generation skipped)') : (st.voice || 'not chosen yet'),
+      genEndpoint: 'HeyGen Avatar V',
+      script: st.script,
+      onScript: e => this.setState({ script: e.target.value, customScript: true }),
+      words: this.words(),
+      durText: this.fmtDur(sec),
+      engine: 'HeyGen Avatar V',
+      costText: '$' + cost.toFixed(2),
+      langs: LANGS.map(l => ({
+        label: l.label,
+        bg: st.lang === l.id ? '#0f172a' : '#ffffff',
+        color: st.lang === l.id ? '#ffffff' : '#475569',
+        border: st.lang === l.id ? '#0f172a' : '#e2e8f0',
+        pick: () => this.setState(s => ({ lang: l.id, script: s.customScript ? s.script : (SCRIPTS[l.id] || SEED) }))
+      })),
+      rewrites: [
+        { label: 'Shorten', run: () => this.rewrite('short') },
+        { label: 'Make it warmer', run: () => this.rewrite('warm') },
+        { label: 'Start over', run: () => this.rewrite('reset') }
+      ],
+      previewVoice: () => this.previewVoice(),
+      previewLabel: st.previewing ? 'Calling MiniMax /v1/t2a_v2…' : 'Play the script',
+      ttsError: st.ttsError,
+
+      ratios: RATIOS.map(r => ({
+        label: r.label, use: r.use, w: r.w, h: r.h, mono,
+        bg: this.grad(bgIdx + 2),
+        shadow: '0 10px 30px -10px rgba(0,0,0,0.14)',
+        ring: ratioId === r.id && st.ratio ? '2px solid #B567C2' : '0px solid transparent',
+        pick: () => { this.setState({ ratio: r.id }); setTimeout(() => this.go('confirm'), 260); }
+      })),
+
+      summary: [
+        { k: 'Face', v: st.builtin === 'avery' ? 'Avery \u2014 Tech blazer' : (st.outfit != null ? ('Becky \u2014 ' + OUTFITS[st.outfit].name) : (st.faceImg ? 'Your photo' : (FACES[faceIdx] ? FACES[faceIdx].name : 'Your photo'))) },
+        { k: 'Background', v: st.outfit != null ? ({ studio: 'White studio', office: 'Modern office', home: 'Warm home' }[st.outfitBg] || 'White studio') : (BGS[bgIdx] ? BGS[bgIdx].name : 'Soft studio') },
+        { k: 'Voice', v: st.voice || 'Clean · English' },
+        { k: 'Spoken language', v: (LANGS.find(l => l.id === st.lang) || LANGS[2]).label },
+        { k: 'Format', v: ratioObj.label + ' · ' + ratioObj.use },
+        { k: 'Resolution', v: st.resolution },
+        { k: 'Length', v: this.fmtDur(sec) }
+      ],
+      scriptPreview: st.script.length > 220 ? st.script.slice(0, 220) + '…' : st.script,
+      generate: () => this.generate(),
+      isKlingEngine: true, // engine-info banner flag; true means "show the current engine's line"
+      genError: st.genError,
+      creditBtnLabel: st.creditState === 'loading' ? 'Checking…' : 'Check balance',
+      checkCredits: () => this.checkCredits(),
+      credits: [
+        { name: 'HeyGen (Avatar V)', value: 'dashboard only', color: '#94a3b8', note: 'No public balance endpoint \u2014 see app.heygen.com billing' },
+        { name: 'MiniMax (speech-2.8-hd)', value: 'dashboard only', color: '#94a3b8', note: 'No balance endpoint \u2014 see platform.minimax.io billing' },
+        { name: 'AceData (Nano Banana 2)', value: 'dashboard only', color: '#94a3b8', note: 'Credit shown in the AceData console, not via API' }
+      ],
+
+      stageLabel: STAGES[Math.max(0, st.stage)],
+      progress: st.progress,
+      stages: STAGES.map((label, i) => ({
+        label,
+        icon: i < st.stage ? '✓' : i === st.stage ? '•' : '',
+        bg: i < st.stage ? '#F4F8F9' : i === st.stage ? '#0f172a' : '#F4F8F9',
+        fg: i < st.stage ? '#B567C2' : '#ffffff',
+        color: i <= st.stage ? '#1e293b' : '#94a3b8',
+        weight: i === st.stage ? 600 : 500
+      })),
+
+      resultTitle: (st.openTitle || (st.builtin === 'avery' ? 'Avery \u2014 Tech blazer' : (st.outfit != null ? 'Becky \u2014 ' + OUTFITS[st.outfit].name : (st.faceImg ? 'Your avatar' : 'Your avatar')))) + ' · ' + ratioObj.label,
+      resultAspect: ratioId.replace(':', ' / '),
+      resultBg: st.mergedImg ? 'url("' + st.mergedImg + '") center/cover' : this.grad(bgIdx + 2),
+      resultVideoUrl: st.resultVideoUrl,
+      videoPlayer: this.videoPlayer(),
+      playLabel: st.resultPlaying ? '❙❙  Pause' : '▶  Play',
+      toggleResultPlay: () => this.toggleResultPlay(),
+      restartResult: () => this.restartResult(),
+
+      noResultVideoUrl: !st.resultVideoUrl,
+      resultMono: mono,
+      ratioLabel: ratioObj.label,
+      subsOn: st.subsOn,
+      subtitleLine: st.subLang === 'tc' ? '早晨，今個季度有三件事做得好。' : st.subLang === 'sc' ? '早上好，这个季度有三件事做得不错。' : 'Good morning everyone. Three things went well this quarter.',
+      toggleSubs: () => this.setState({ subsOn: !st.subsOn }),
+      subsTrack: st.subsOn ? '#0f172a' : '#cbd5e1',
+      subsJustify: st.subsOn ? 'flex-end' : 'flex-start',
+      subLangs: SUBS.map(s => ({
+        label: s.label, check: st.subLang === s.id ? '✓' : '',
+        bg: st.subLang === s.id ? '#ffffff' : 'transparent',
+        border: st.subLang === s.id ? '#0f172a' : '#e2e8f0',
+        weight: st.subLang === s.id ? 600 : 500,
+        pick: () => this.setState({ subLang: s.id, subsOn: true })
+      })),
+      downloadVideo: () => this.downloadVideo(),
+
+      versions: [{ id: 'orig', label: 'Original' }].map(v => ({
+        label: v.label,
+        thumb: this.grad(bgIdx + 2),
+        bg: st.version === v.id ? '#F4F8F9' : '#ffffff',
+        border: st.version === v.id ? '#0f172a' : '#e2e8f0',
+        pick: () => this.setState({ version: v.id })
+      })),
+
+      savePrompt: st.savePrompt,
+      avatarName: st.avatarName,
+      onName: e => this.setState({ avatarName: e.target.value }),
+      saveAvatar: () => {
+        const entry = { id: 'a' + Date.now(), name: st.avatarName || 'New avatar', mono, voice: st.voice || 'Clean · English', face: faceIdx, bg: bgIdx, thumb: st.mergedImg || st.faceImg || '' };
+        this.mutate(store => { store.saved = store.saved.concat([entry]); });
+        this.setState({ savePrompt: false });
+      },
+      hasSaved: st.saved.length > 0,
+      noSaved: false,
+      noCustomSaved: st.saved.length === 0,
+      notAddingLook: !st.addingLook,
+      builtinAvatars: [],
+      hasProjects: st.projects.length > 0,
+      dismissSave: () => this.setState({ savePrompt: false }),
+
+      saved: st.saved.map(a => {
+        const looks = this.looksOf(a);
+        return {
+          name: a.name, mono: a.mono, voice: a.voice,
+          bg: a.thumb ? 'url("' + a.thumb + '") center top/cover' : this.grad(a.bg + 2),
+          lookCount: looks.length === 1 ? '1 look' : looks.length + ' looks',
+          use: () => this.setState({ face: a.face, bg: a.bg, voice: a.voice, mergedImg: a.thumb || null, faceImg: a.thumb || null, builtin: null, outfit: null, outfitBg: null, mergeError: '', screen: 'face', facePage: 'background' }),
+          open: () => this.setState({ libraryAvatar: a.id, screen: 'library' }),
+          remove: () => this.mutate(store => { store.saved = store.saved.filter(x => x.id !== a.id); })
+        };
+      }),
+
+      namePrompt: st.namePrompt,
+      pendingImgBg: st.pendingImg ? 'url("' + st.pendingImg + '") center top/cover' : '#F4F8F9',
+      newAvatarName: st.newAvatarName,
+      onNewAvatarName: e => this.setState({ newAvatarName: e.target.value }),
+      confirmNewAvatar: () => this.confirmNewAvatar(),
+      saveAvatarLabel: st.pendingUploading ? 'Uploading photo…' : 'Save & continue',
+      nameError: st.nameError,
+      cancelNewAvatar: () => this.cancelNewAvatar(),
+
+      inAvatarDetail: !!openAvatar,
+      inAvatarList: !openAvatar,
+      detailName: openAvatar ? openAvatar.name : '',
+      detailVoice: openAvatar ? openAvatar.voice : '',
+      backToAvatars: () => this.setState({ libraryAvatar: null }),
+      addAvatarFromLibrary: () => { this.setState({ screen: 'face', facePage: 'select' }); this.uploadFace(); },
+      addLook: () => openAvatar && this.addLook(openAvatar.id),
+      addingLook: st.addingLook,
+      detailLooks: openAvatar ? this.looksOf(openAvatar).map(l => ({
+        label: l.label,
+        bg: 'url("' + l.url + '") center top/cover',
+        use: () => this.useLook(l.url),
+        remove: () => this.removeLook(openAvatar.id, l.id),
+        menu: e => this.openLookMenu(e, { kind: 'avatarLook', avatarId: openAvatar.id, lookId: l.id, name: l.label })
+      })) : [],
+
+      projects: st.projects.slice(0, 6).map(projectCard)
+    };
+  }
+}
+
+</script>
+</body>
+</html>
