@@ -580,20 +580,6 @@
                 </div>
               </div>
             </sc-if>
-
-            <div style="border:1px solid #eef2f5;border-radius:20px;padding:22px;background:#F4F8F9">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-                <span style="font-size:.9rem;font-weight:600;color:#1e293b">Subtitles</span>
-                <button onClick="{{ toggleSubs }}" style="width:42px;height:24px;border-radius:14px;border:0;background:{{ subsTrack }};cursor:pointer;padding:3px;display:flex;justify-content:{{ subsJustify }};transition:background .2s ease">
-                  <span style="width:18px;height:18px;border-radius:50%;background:#ffffff;display:block;box-shadow:0 2px 5px rgba(0,0,0,.2)"></span>
-                </button>
-              </div>
-              <div style="display:flex;flex-direction:column;gap:7px">
-                <sc-for list="{{ subLangs }}" as="s" hint-placeholder-count="3">
-                  <button onClick="{{ s.pick }}" style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border:1px solid {{ s.border }};border-radius:12px;background:{{ s.bg }};font-family:inherit;font-size:.8rem;font-weight:{{ s.weight }};color:#1e293b;cursor:pointer;text-align:left;transition:border-color .16s ease" style-hover="border-color:#0f172a">{{ s.label }}<span style="font-size:.72rem;color:#94a3b8">{{ s.check }}</span></button>
-                </sc-for>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -931,6 +917,8 @@ class Component extends DCLogic {
 
   componentDidMount() {
     this.loadPersisted();
+    this.syncFromRemote();
+    this.startRemoteWatcher();
     this.loadClonedVoices();
     this.ensureBuiltinAssets();
     this.startWatcher();
@@ -961,6 +949,76 @@ class Component extends DCLogic {
         ratio: d.ratio || null, resolution: d.resolution || '1080p', ttsModel: d.ttsModel || 'speech-2.8-hd'
       });
     } catch (e) {}
+  }
+
+  // The shared collections (avatars, projects, folders, backgrounds, voice nicknames — everything
+  // EXCEPT the in-progress draft, which stays local to this browser) live in one JSON row in
+  // Supabase so every visitor sees the same library, not just this browser's localStorage copy.
+  static DB_TABLE = 'app_state';
+  static DB_ROW_ID = 'global';
+
+  sharedSlice(store) {
+    return {
+      projects: store.projects, folders: store.folders, saved: store.saved,
+      voiceNames: store.voiceNames, bgLibrary: store.bgLibrary,
+      nameOverrides: store.nameOverrides, builtinLooks: store.builtinLooks
+    };
+  }
+
+  async fetchRemoteStore() {
+    const sb = this.getSupabase();
+    if (!sb) return null;
+    try {
+      const { data, error } = await sb.from(Component.DB_TABLE).select('data').eq('id', Component.DB_ROW_ID).maybeSingle();
+      if (error || !data) return null;
+      return data.data || null;
+    } catch (e) { return null; }
+  }
+
+  async writeRemoteStore(store) {
+    const sb = this.getSupabase();
+    if (!sb) return;
+    try {
+      await sb.from(Component.DB_TABLE).upsert({ id: Component.DB_ROW_ID, data: this.sharedSlice(store), updated_at: new Date().toISOString() });
+    } catch (e) { console.warn('[app_state] remote sync failed', e); }
+  }
+
+  // On mount: pull whatever the shared library currently holds and adopt it, so a browser that
+  // has never touched localStorage still sees every avatar/project/background that exists.
+  async syncFromRemote() {
+    const shared = await this.fetchRemoteStore();
+    if (!shared) return;
+    const store = this.readStore();
+    Object.assign(store, this.sharedSlice(shared));
+    store.projects = this.normaliseProjects(store.projects || []);
+    this.writeStore(store);
+    this.setState({
+      projects: store.projects, folders: store.folders, saved: store.saved,
+      voiceNames: store.voiceNames, bgLibrary: store.bgLibrary,
+      nameOverrides: store.nameOverrides, builtinLooks: store.builtinLooks
+    });
+  }
+
+  // While this tab is open, pick up changes made from any other browser/device in real time —
+  // mirrors what onExternalStore already does for same-browser tabs via the 'storage' event.
+  startRemoteWatcher() {
+    const sb = this.getSupabase();
+    if (!sb) return;
+    this._remoteChannel = sb.channel('app_state_sync')
+      .on('postgres_changes', { event: '*', schema: 'public', table: Component.DB_TABLE, filter: 'id=eq.' + Component.DB_ROW_ID }, payload => {
+        const shared = payload.new && payload.new.data;
+        if (!shared) return;
+        const store = this.readStore();
+        Object.assign(store, this.sharedSlice(shared));
+        store.projects = this.normaliseProjects(store.projects || []);
+        this.writeStore(store);
+        this.setState({
+          projects: store.projects, folders: store.folders, saved: store.saved,
+          voiceNames: store.voiceNames, bgLibrary: store.bgLibrary,
+          nameOverrides: store.nameOverrides, builtinLooks: store.builtinLooks
+        });
+      })
+      .subscribe();
   }
 
   static STORE = 'indexAvatarStore_v1';
@@ -999,6 +1057,7 @@ class Component extends DCLogic {
     fn(store);
     this.writeStore(store);
     this.setState({ projects: store.projects, folders: store.folders, saved: store.saved, voiceNames: store.voiceNames, bgLibrary: store.bgLibrary, builtinLooks: store.builtinLooks, nameOverrides: store.nameOverrides });
+    this.writeRemoteStore(store); // fire-and-forget — local state/UI already updated above
   }
 
   // Only this view's own draft and voice nicknames — never the shared collections.
@@ -1212,6 +1271,7 @@ class Component extends DCLogic {
   componentWillUnmount() {
     clearInterval(this._t); clearInterval(this._r); clearInterval(this._w); clearInterval(this._quotaTimer);
     window.removeEventListener('storage', this.onExternalStore);
+    if (this._remoteChannel) this.getSupabase()?.removeChannel(this._remoteChannel);
     this.stopPreview();
   }
 
@@ -1287,8 +1347,26 @@ class Component extends DCLogic {
     return data && data.publicUrl;
   }
 
+  // Some external hosts (e.g. AceData's Nano Banana CDN) send no CORS headers at all, so a
+  // same-origin fetch() from this page throws "Failed to fetch" even though the URL is public
+  // and renders fine as an <img>/background-image. Route anything not already in our own
+  // Supabase bucket through the fetch-remote-image Edge Function, which fetches server-side
+  // (no CORS involved) and re-hosts it for us.
+  async proxyFetchUrl(url, bucket) {
+    const sb = this.getSupabase();
+    if (!sb) return null;
+    try {
+      const { data, error } = await sb.functions.invoke('fetch-remote-image', { body: { url, bucket } });
+      if (error || !data || !data.url) return null;
+      return data.url;
+    } catch (e) { return null; }
+  }
+
   async ensurePublicUrl(url, bucket, ext) {
-    if (/^https?:\/\//i.test(url)) return url;
+    if (/^https?:\/\//i.test(url)) {
+      if (url.startsWith(Component.SUPABASE_URL)) return url;
+      return (await this.proxyFetchUrl(url, bucket)) || url;
+    }
     const res = await fetch(url);
     const blob = await res.blob();
     const uploaded = await this.uploadToSupabase(bucket, blob, ext);
@@ -1950,7 +2028,7 @@ class Component extends DCLogic {
         body: JSON.stringify({
           type: 'avatar', avatar_id: lookId,
           audio_url: audioUrl,
-          resolution: this.state.resolution || '1080p', aspect_ratio: 'auto',
+          resolution: this.state.resolution || '1080p', aspect_ratio: this.state.ratio || '16:9',
           engine: { type: 'avatar_v' }
         })
       });
