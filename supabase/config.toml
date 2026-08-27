@@ -1,0 +1,7 @@
+project_id = "atxzerjckguzoczwfztx"
+
+[functions.fetch-remote-image]
+enabled = true
+# No login exists anywhere in this app — every call already goes out with just
+# the public anon key, same as every other Supabase call in index.html.
+verify_jwt = false

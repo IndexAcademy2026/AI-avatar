@@ -12,7 +12,7 @@
 // Deploy: supabase functions deploy fetch-remote-image
 // Invoke from the client: supabase.functions.invoke('fetch-remote-image', { body: { url, bucket } })
 
-import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',

@@ -965,6 +965,21 @@ class Component extends DCLogic {
     };
   }
 
+  // Only adopt fields the remote row actually has the right shape for — an empty/partial row
+  // (e.g. the freshly-seeded '{}' before anyone has ever mutated a shared collection) must never
+  // clobber this browser's already-valid local arrays/objects with undefined.
+  mergeShared(store, shared) {
+    const s = this.sharedSlice(shared);
+    if (Array.isArray(s.projects)) store.projects = s.projects;
+    if (Array.isArray(s.folders)) store.folders = s.folders;
+    if (Array.isArray(s.saved)) store.saved = s.saved;
+    if (s.voiceNames && typeof s.voiceNames === 'object') store.voiceNames = s.voiceNames;
+    if (Array.isArray(s.bgLibrary)) store.bgLibrary = s.bgLibrary;
+    if (s.nameOverrides && typeof s.nameOverrides === 'object') store.nameOverrides = s.nameOverrides;
+    if (s.builtinLooks && typeof s.builtinLooks === 'object') store.builtinLooks = s.builtinLooks;
+    return store;
+  }
+
   async fetchRemoteStore() {
     const sb = this.getSupabase();
     if (!sb) return null;
@@ -989,7 +1004,7 @@ class Component extends DCLogic {
     const shared = await this.fetchRemoteStore();
     if (!shared) return;
     const store = this.readStore();
-    Object.assign(store, this.sharedSlice(shared));
+    this.mergeShared(store, shared);
     store.projects = this.normaliseProjects(store.projects || []);
     this.writeStore(store);
     this.setState({
@@ -1009,7 +1024,7 @@ class Component extends DCLogic {
         const shared = payload.new && payload.new.data;
         if (!shared) return;
         const store = this.readStore();
-        Object.assign(store, this.sharedSlice(shared));
+        this.mergeShared(store, shared);
         store.projects = this.normaliseProjects(store.projects || []);
         this.writeStore(store);
         this.setState({
