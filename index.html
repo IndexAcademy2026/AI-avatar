@@ -146,7 +146,7 @@
           <sc-if value="{{ isBeckyChoice }}" hint-placeholder-val="{{ true }}">
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:800px">
             <sc-for list="{{ outfits }}" as="f" hint-placeholder-count="3">
-              <button onClick="{{ f.pick }}" onContextMenu="{{ f.menu }}" style="position:relative;aspect-ratio:2/3;border:0;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;background:#f4f4f4 url("{{ f.thumb }}") center/cover;box-shadow:0 10px 30px -10px rgba(0,0,0,0.1);outline:{{ f.ring }};outline-offset:2px;transition:transform .18s ease,box-shadow .18s ease" style-hover="transform:translateY(-3px)">
+              <button onClick="{{ f.pick }}" onContextMenu="{{ f.menu }}" style="position:relative;aspect-ratio:2/3;border:0;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;background:#f4f4f4 url('{{ f.thumb }}') center/cover;box-shadow:0 10px 30px -10px rgba(0,0,0,0.1);outline:{{ f.ring }};outline-offset:2px;transition:transform .18s ease,box-shadow .18s ease" style-hover="transform:translateY(-3px)">
                 <span style="position:absolute;left:0;right:0;bottom:0;padding:26px 16px 14px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.55));font-size:.82rem;font-weight:600;color:#ffffff">{{ f.name }}</span>
               </button>
             </sc-for>
@@ -164,7 +164,7 @@
           <sc-if value="{{ isAveryChoice }}">
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:800px">
             <sc-for list="{{ averyLooks }}" as="al" hint-placeholder-count="2">
-              <button onClick="{{ al.pick }}" onContextMenu="{{ al.menu }}" style="position:relative;aspect-ratio:2/3;border:0;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;background:#f4f4f4 url("{{ al.thumb }}") center/cover;box-shadow:0 10px 30px -10px rgba(0,0,0,0.1);outline:{{ al.ring }};outline-offset:2px;transition:transform .18s ease" style-hover="transform:translateY(-3px)">
+              <button onClick="{{ al.pick }}" onContextMenu="{{ al.menu }}" style="position:relative;aspect-ratio:2/3;border:0;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;background:#f4f4f4 url('{{ al.thumb }}') center/cover;box-shadow:0 10px 30px -10px rgba(0,0,0,0.1);outline:{{ al.ring }};outline-offset:2px;transition:transform .18s ease" style-hover="transform:translateY(-3px)">
                 <span style="position:absolute;left:0;right:0;bottom:0;padding:26px 16px 14px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.55));font-size:.82rem;font-weight:600;color:#ffffff">{{ al.name }}</span>
               </button>
             </sc-for>
@@ -219,7 +219,7 @@
         <sc-if value="{{ onPreviewPage }}" hint-placeholder-val="{{ false }}">
           <p style="font-size:.98rem;color:#64748b;line-height:1.5;margin-bottom:16px">Here's the composed result.</p>
           <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">
-            <span style="display:block;width:300px;aspect-ratio:2/3;border-radius:20px;overflow:hidden;background:#f4f4f4 url("{{ previewImg }}") center/cover;box-shadow:0 10px 30px -10px rgba(0,0,0,.14)"></span>
+            <span style="display:block;width:300px;aspect-ratio:2/3;border-radius:20px;overflow:hidden;background:#f4f4f4 url('{{ previewImg }}') center/cover;box-shadow:0 10px 30px -10px rgba(0,0,0,.14)"></span>
             <div style="display:flex;flex-direction:column;gap:10px;padding-top:6px">
               <button onClick="{{ confirmPreview }}" style="padding:11px 22px;border:1px solid #0f172a;border-radius:20px;background:#0f172a;color:#ffffff;font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer">Continue →</button>
               <button onClick="{{ changeBackground }}" style="padding:11px 22px;border:1px solid #e2e8f0;border-radius:20px;background:#ffffff;font-family:inherit;font-size:.82rem;font-weight:600;color:#475569;cursor:pointer" style-hover="border-color:#B567C2;color:#B567C2">Choose a different background</button>
