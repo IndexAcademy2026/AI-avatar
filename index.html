@@ -219,7 +219,7 @@
         <sc-if value="{{ onPreviewPage }}" hint-placeholder-val="{{ false }}">
           <p style="font-size:.98rem;color:#64748b;line-height:1.5;margin-bottom:16px">Here's the composed result.</p>
           <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">
-            <span style="display:block;width:300px;aspect-ratio:2/3;border-radius:20px;overflow:hidden;background:#f4f4f4 url('{{ previewImg }}') center/cover;box-shadow:0 10px 30px -10px rgba(0,0,0,.14)"></span>
+            <span style="display:block;width:480px;max-width:100%;aspect-ratio:16/9;border-radius:20px;overflow:hidden;background:#f4f4f4 url('{{ previewImg }}') center/contain no-repeat;box-shadow:0 10px 30px -10px rgba(0,0,0,.14)"></span>
             <div style="display:flex;flex-direction:column;gap:10px;padding-top:6px">
               <button onClick="{{ confirmPreview }}" style="padding:11px 22px;border:1px solid #0f172a;border-radius:20px;background:#0f172a;color:#ffffff;font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer">Continue →</button>
               <button onClick="{{ changeBackground }}" style="padding:11px 22px;border:1px solid #e2e8f0;border-radius:20px;background:#ffffff;font-family:inherit;font-size:.82rem;font-weight:600;color:#475569;cursor:pointer" style-hover="border-color:#B567C2;color:#B567C2">Choose a different background</button>
@@ -541,11 +541,6 @@
                 <span style="font-size:4rem;font-weight:500;color:rgba(15,23,42,.22)">{{ resultMono }}</span>
               </sc-if>
               <span style="position:absolute;left:18px;top:18px;padding:5px 12px;border-radius:20px;background:rgba(255,255,255,.92);font-size:.7rem;font-weight:600;color:#1e293b;pointer-events:none">{{ ratioLabel }}</span>
-              <sc-if value="{{ subsOn }}">
-                <span style="position:absolute;left:6%;right:6%;bottom:16%;display:flex;justify-content:center;pointer-events:none">
-                  <span style="padding:8px 16px;border-radius:10px;background:rgba(15,23,42,.82);color:#ffffff;font-size:.9rem;font-weight:500;line-height:1.4;text-align:center;text-wrap:pretty">{{ subtitleLine }}</span>
-                </span>
-              </sc-if>
               <sc-if value="{{ noResultVideoUrl }}" hint-placeholder-val="{{ true }}">
                 <span style="position:absolute;left:0;right:0;bottom:0;height:44px;display:flex;align-items:center;gap:12px;padding:0 18px;background:linear-gradient(to top,rgba(0,0,0,.35),rgba(0,0,0,0))">
                   <span style="font-size:.7rem;color:#ffffff">▶</span>
@@ -865,7 +860,6 @@ const SCRIPTS = {
   zh: "早上好,各位。这个季度有三件事进展顺利:我们上线了新的引导流程,把客服响应时间缩短了一半,收入增长了百分之十一。有一件事要改变——从周一开始,每个团队都要写一份一页纸的周报。",
   yue: "早晨,各位。今個季度有三件事做得幾好:我哋上咗新嘅引導流程,將客戶支援回應時間減咗一半,收入增長咗百分之十一。有一樣嘢要改變——由星期一開始,每個團隊都要寫一份一頁嘅週報。"
 };
-const SUBS = [{ id: 'tc', label: 'Traditional Chinese' }, { id: 'sc', label: 'Simplified Chinese' }, { id: 'en', label: 'English' }];
 const RATIOS = [
   { id: '16:9', label: '16:9', use: 'Landscape', w: 232, h: 130 },
   { id: '9:16', label: '9:16', use: 'Vertical', w: 110, h: 196 },
@@ -886,7 +880,7 @@ class Component extends DCLogic {
     creditState: 'idle', falBalance: null,
     voiceFilter: 'all', sampling: '', playing: '',
     previewing: false, stage: -1, progress: 0,
-    subsOn: true, subLang: 'en', savePrompt: false, avatarName: '',
+    savePrompt: false, avatarName: '',
     version: 'orig', minutes: 42, resolution: '1080p',
     saved: [], projects: [], clonedVoices: [], builtinUrls: {},
     folders: [], folderFilter: 'all', editingFolder: '', folderDraft: '',
@@ -1251,7 +1245,9 @@ class Component extends DCLogic {
       onPlay: () => this.setState({ resultPlaying: true }),
       onPause: () => this.setState({ resultPlaying: false }),
       onEnded: () => this.setState({ resultPlaying: false }),
-      style: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain' }
+      // cover, not contain: if the rendered video's ratio doesn't match the chosen format we
+      // want it cropped to fill the frame, never letterboxed with blank bars.
+      style: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }
     });
   }
 
@@ -1477,9 +1473,12 @@ class Component extends DCLogic {
       const bgUrl = await this.ensurePublicUrl(bgImageUrl, 'backgrounds', 'png');
       const body = {
         async: false, count: 1, model: 'nano-banana', action: 'edit',
-        prompt: 'Change background of image 1 to the background of image 2. \nKeep the full character of image 1 exactly the same (pose, body, clothes, face \u2014 no changes). \nMatch and merge the lighting + color tone of image 2 onto the character for a natural blend.',
+        prompt: 'Change background of image 1 to the background of image 2. \nKeep the full character of image 1 exactly the same (pose, body, clothes, face \u2014 no changes). \nCompose into a wide 16:9 landscape frame: the complete character stays uncropped and centred horizontally, with the whole body in frame and clear headroom above \u2014 nothing cut off at any edge. Extend the background of image 2 naturally to fill the full 16:9 frame. \nMatch and merge the lighting + color tone of image 2 onto the character for a natural blend.',
         image_urls: [faceUrl, bgUrl],
-        resolution: '1K', aspect_ratio: '1:1'
+        // Always compose the widest supported frame. Narrower output formats (1:1, 4:5, 9:16)
+        // are cropped from this, which keeps the avatar full-bleed instead of pillarboxed in
+        // white the way a square source was when rendered to 16:9.
+        resolution: '1K', aspect_ratio: '16:9'
       };
       const res = await fetch('https://api.acedata.cloud/nano-banana/images', {
         method: 'POST',
@@ -1743,9 +1742,12 @@ class Component extends DCLogic {
       const bgUrl = bgImageUrl ? await this.ensurePublicUrl(bgImageUrl, 'backgrounds', 'png') : null;
       const body = {
         async: false, count: 1, model: 'nano-banana', action: 'edit',
-        prompt: 'Change background of image 1 to the background of image 2. \nKeep the full character of image 1 exactly the same (pose, body, clothes, face \u2014 no changes). \nMatch and merge the lighting + color tone of image 2 onto the character for a natural blend.',
+        prompt: 'Change background of image 1 to the background of image 2. \nKeep the full character of image 1 exactly the same (pose, body, clothes, face \u2014 no changes). \nCompose into a wide 16:9 landscape frame: the complete character stays uncropped and centred horizontally, with the whole body in frame and clear headroom above \u2014 nothing cut off at any edge. Extend the background of image 2 naturally to fill the full 16:9 frame. \nMatch and merge the lighting + color tone of image 2 onto the character for a natural blend.',
         image_urls: bgUrl ? [faceUrl, bgUrl] : [faceUrl],
-        resolution: '1K', aspect_ratio: '1:1'
+        // Always compose the widest supported frame. Narrower output formats (1:1, 4:5, 9:16)
+        // are cropped from this, which keeps the avatar full-bleed instead of pillarboxed in
+        // white the way a square source was when rendered to 16:9.
+        resolution: '1K', aspect_ratio: '16:9'
       };
       const res = await fetch('https://api.acedata.cloud/nano-banana/images', {
         method: 'POST',
@@ -2448,18 +2450,6 @@ class Component extends DCLogic {
       noResultVideoUrl: !st.resultVideoUrl,
       resultMono: mono,
       ratioLabel: ratioObj.label,
-      subsOn: st.subsOn,
-      subtitleLine: st.subLang === 'tc' ? '早晨，今個季度有三件事做得好。' : st.subLang === 'sc' ? '早上好，这个季度有三件事做得不错。' : 'Good morning everyone. Three things went well this quarter.',
-      toggleSubs: () => this.setState({ subsOn: !st.subsOn }),
-      subsTrack: st.subsOn ? '#0f172a' : '#cbd5e1',
-      subsJustify: st.subsOn ? 'flex-end' : 'flex-start',
-      subLangs: SUBS.map(s => ({
-        label: s.label, check: st.subLang === s.id ? '✓' : '',
-        bg: st.subLang === s.id ? '#ffffff' : 'transparent',
-        border: st.subLang === s.id ? '#0f172a' : '#e2e8f0',
-        weight: st.subLang === s.id ? 600 : 500,
-        pick: () => this.setState({ subLang: s.id, subsOn: true })
-      })),
       downloadVideo: () => this.downloadVideo(),
 
       versions: [{ id: 'orig', label: 'Original' }].map(v => ({
@@ -2492,7 +2482,12 @@ class Component extends DCLogic {
           name: a.name, mono: a.mono, voice: a.voice,
           bg: a.thumb ? 'url("' + a.thumb + '") center top/cover' : this.grad(a.bg + 2),
           lookCount: looks.length === 1 ? '1 look' : looks.length + ' looks',
-          use: () => this.setState({ face: a.face, bg: a.bg, voice: a.voice, mergedImg: a.thumb || null, faceImg: a.thumb || null, builtin: null, outfit: null, outfitBg: null, mergeError: '', screen: 'face', facePage: 'background' }),
+          // More than one look: let the user pick which one first (the avatar detail page
+          // already has that picker). Only one look (or none) — nothing to choose, so go
+          // straight to background selection like before.
+          use: () => looks.length > 1
+            ? this.setState({ libraryAvatar: a.id, screen: 'library' })
+            : this.setState({ face: a.face, bg: a.bg, voice: a.voice, mergedImg: a.thumb || null, faceImg: a.thumb || null, builtin: null, outfit: null, outfitBg: null, mergeError: '', screen: 'face', facePage: 'background' }),
           open: () => this.setState({ libraryAvatar: a.id, screen: 'library' }),
           remove: () => this.mutate(store => { store.saved = store.saved.filter(x => x.id !== a.id); })
         };
